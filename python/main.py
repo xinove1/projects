@@ -2,7 +2,7 @@
 
 nome = input("Qual seu nome?")
 if (nome == "duzy"):
-    print("oi duzy")
+    print("")
 else:
     print("oi babi")
 
