@@ -13,14 +13,14 @@ CFLAGS= -Wall -Wextra -Werror -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 RM= rm -f
 
-SRC= main.c
+SRC= main.c menus.c gameplay.c
 
 OBJ=$(SRC:.c=.o)
 
-$(NAME): $(SRC) frogame.h
+$(NAME): $(addprefix src/, $(SRC)) src/frogame.h
 	@make -C $(LIBFT)
 	@make -C $(LIBFT) bonus
-	$(CC) $(CFLAGS) -c $(SRC)
+	$(CC) $(CFLAGS) -c $(addprefix src/, $(SRC))
 	$(CC) $(OBJ) $(LIBFT)/libft.a $(CFLAGS) -o $(NAME)
 
 all: $(NAME)
