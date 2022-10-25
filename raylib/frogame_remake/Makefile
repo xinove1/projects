@@ -9,7 +9,7 @@ LIBFT = ./../../libft
 
 CC= gcc
 
-CFLAGS= -Wall -Wextra -Werror -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+CFLAGS= -Wall -Wextra -Werror -lraylib -g3 -lGL -lm -lpthread -ldl -lrt -lX11
 
 RM= rm -f
 

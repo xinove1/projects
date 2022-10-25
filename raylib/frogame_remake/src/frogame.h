@@ -15,8 +15,11 @@ typedef struct s_player
 	t_entities_type	type;
     Rectangle	hitbox;
     int			blocking;
-	Texture2D	texture[2]; //NOTE may cause problems in s_entities type casting
+	Texture2D	sheet[2];
+	Texture2D	texture;
+	Rectangle	frame;
     Vector2		position;
+	Vector2		dir;
     float		speed;
 	bool		on_wall;
     bool		can_jump;
@@ -28,6 +31,7 @@ typedef struct s_bat
     Rectangle	hitbox;
     int			blocking;
 	Texture2D	texture;
+	Rectangle	frame;
     Vector2		position;
     float		speed;
 } t_bat;

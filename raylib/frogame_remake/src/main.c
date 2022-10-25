@@ -25,8 +25,9 @@ int main(void)
 		switch (data.current_screen)
 		{
 			case MENU:
+			{
 				menu_main(&data);
-			break ;
+			}
 
 			case CREDITS:
 				credit_main(&data);
