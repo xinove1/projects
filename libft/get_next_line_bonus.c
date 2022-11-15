@@ -25,7 +25,7 @@ char	*get_next_line(int fd)
 	char			*s;
 
 	s = NULL;
-	if (fd < 0 || fd > RLIMIT_NOFILE || BUFFER_SIZE < 1)
+	if (fd < 0 || fd > RLIMIT_NOFILE || BUFFER_SIZE < 1 )
 		return (NULL);
 	last = get_last(&reminders, fd);
 	if (last[0] != '\0' && process_last(&s, last))
@@ -51,7 +51,7 @@ static int	read_to_buffer(char *last, char buffer[], char **s, int fd)
 		i++;
 	*s = append_to_string(*s, buffer, i + 1);
 	if (buffer[i] == '\n' && buffer[i + 1])
-		ft_memmove(last, &buffer[i + 1], BUFFER_SIZE - i);
+		ft_memmove_gnl(last, &buffer[i + 1], BUFFER_SIZE - i);
 	if (buffer[i] == '\n')
 		return (0);
 	return (1);
@@ -69,7 +69,7 @@ static int	process_last(char **s, char last[])
 	*s = append_to_string(*s, last, i + 1);
 	if (last[i] == '\n' && last[i + 1])
 	{
-		ft_memmove(last, &last[i + 1], ft_strlen(last) - i);
+		ft_memmove_gnl(last, &last[i + 1], ft_strlen(last) - i);
 		flag = 1;
 	}
 	else if (last[i] == '\n')
