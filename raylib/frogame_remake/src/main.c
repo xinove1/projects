@@ -1,10 +1,19 @@
 #include "frogame.h"
-#include <raylib.h>
 
 int main(void)
 {
-	t_data	data = {0};
-	data.current_screen = MENU;
+	// Inialize most structs and variables
+	t_data		data = {0};
+	t_screen	current_screen = MENU;
+	bool		window_exit = false;
+
+	// Load every texture needed
+
+
+	// Load highscore from .data
+
+
+	//
 
 	// Window
 	data.win_scale = 8.0f;
@@ -17,32 +26,45 @@ int main(void)
     data.camera.rotation = 0.0f;
     data.camera.zoom = data.win_scale;
 
-    InitWindow(data.win_width, data.win_height, "raylib [core] example - basic window");
+	// Raylib
+    SetExitKey(KEY_NULL);       // Disable KEY_ESCAPE to close window, X-button still works
+    InitWindow(data.win_width, data.win_height, "Frogame Remake");
 	SetTargetFPS(60);
 
-    while (!WindowShouldClose())
+	t_map map = parse_map("test");
+	for (int i = 0; i < map.sz.y; i++)
+	{
+		for (int j = 0; j < map.sz.x; j++)
+			ft_printf("%c", map.map[i][j]);
+		ft_printf("\n");
+	}
+
+    while (!window_exit)
     {
-		switch (data.current_screen)
+		switch (current_screen)
 		{
 			case MENU:
-			{
-				menu_main(&data);
-			}
+				current_screen = menu_main(&data);
+			break ;
 
 			case CREDITS:
-				credit_main(&data);
+				current_screen = credit_main(&data);
 			break ;
 
 			case GAMEPLAY:
-				gameplay_main(&data);
+				current_screen = gameplay_main(&data);
 			break ;
 
 			case DEATH:
-				death_main(&data);
+				current_screen = death_main(&data);
+			break ;
+
+			case EXIT_GAME:
+				//TODO SAVE HIGHSCORE
+				window_exit = true;
 			break ;
 		}
     }
-
+	//TODO Memory cleanup before exit
     CloseWindow();
-    return 0;
 }

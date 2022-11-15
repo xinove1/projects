@@ -13,7 +13,7 @@ CFLAGS= -Wall -Wextra -Werror -lraylib -g3 -lGL -lm -lpthread -ldl -lrt -lX11
 
 RM= rm -f
 
-SRC= main.c menus.c gameplay.c
+SRC= main.c menus.c gameplay.c map_parser.c
 
 OBJ=$(SRC:.c=.o)
 

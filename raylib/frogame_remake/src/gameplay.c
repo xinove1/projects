@@ -1,5 +1,4 @@
 #include "frogame.h"
-#include <raylib.h>
 #define MAX_FRAME_SPEED     15
 #define MIN_FRAME_SPEED      1
 
@@ -8,20 +7,22 @@ static void		bat_animation(t_bat *bat, bool time_dark);
 static t_player	init_player();
 static t_bat	init_bat();
 
-void	gameplay_main(t_data *data)
+int	gameplay_main(t_data *data)
 {
+	t_screen	current_screen = GAMEPLAY;
 	t_player	player = init_player();
 	t_bat		bat = init_bat();
 
-	data->player = &player;
+	data->player = player;
 
-
-    while (!WindowShouldClose())
+    while (current_screen == GAMEPLAY)
     {
         // Update
         player_animation(&player, data->time_dark);
         bat_animation(&bat, data->time_dark);
 
+		if (WindowShouldClose())
+			current_screen = EXIT_GAME;
 		if (IsKeyPressed(KEY_SPACE))
 		{
 			if (data->time_dark)
@@ -43,12 +44,11 @@ void	gameplay_main(t_data *data)
 		EndMode2D();
         EndDrawing();
     }
-	exit(0);
     // De-Initialization
     UnloadTexture(player.sheet[0]);
     UnloadTexture(player.sheet[1]);
 	UnloadTexture(bat.texture);
-	data->player = NULL;
+	return (current_screen);
 }
 
 static void	player_animation(t_player *player, bool time_dark)
@@ -58,6 +58,7 @@ static void	player_animation(t_player *player, bool time_dark)
     static int frames_speed = 8; // Number of spritesheet frames shown by second
 	frames_counter++;
 
+	//NOTE frame rate of the animation is expecting 60 fps
 	if (frames_counter >= (60 / frames_speed))
 	{
 		frames_counter = 0;
@@ -68,9 +69,8 @@ static void	player_animation(t_player *player, bool time_dark)
 			player->texture = player->sheet[1];
 		else
 			player->texture = player->sheet[0];
-		// NOTE move to if and else statment for performance? + change if to check if time dark changend
 		player->frame.width = (float)player->texture.width / 7;
-		if (player->dir.x < 0 && player->frame.width > 0)
+		if (player->dir.x < 0 && player->frame.width > 0) // Flipping frame to match where player is moving
 			player->frame.width = -player->frame.width;
 		player->frame.height = (float)player->texture.height / 3;
 		player->frame.x = (float)current_frame * (float)player->texture.width / 7;
