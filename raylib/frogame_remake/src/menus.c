@@ -1,11 +1,10 @@
 #include "frogame.h"
-#include <raylib.h>
 
 int	menu_main(t_data *data)
 {
 	t_screen	current_screen = MENU;
 
-	Texture menu_texture = LoadTexture("Assets/MENU_BASIC2.png");
+	Texture2D	menu_texture = data->textures.screens[0];
 
 	Rectangle play_b = {5, 28, 20, 10};
 	Rectangle credit_b = {5, 41, 20, 10};
@@ -31,14 +30,13 @@ int	menu_main(t_data *data)
 		EndMode2D();
 		EndDrawing();
 	}
-	UnloadTexture(menu_texture);
 	return (current_screen);
 }
 
 int	credit_main(t_data *data)
 {
 	t_screen	current_screen = CREDITS;
-	Texture credits_texture = LoadTexture("Assets/CREDITOS.png");
+	Texture2D	credits_texture = data->textures.screens[1];
 
 	Rectangle exit_b = {14, 72, 20, 10};
 
@@ -60,15 +58,14 @@ int	credit_main(t_data *data)
 		EndMode2D();
 		EndDrawing();
 	}
-	UnloadTexture(credits_texture);
 	return (current_screen);
 }
 
 int	death_main(t_data *data)
 {
 	t_screen	current_screen = DEATH;
-	Texture		death_texture1 = LoadTexture("Assets/YOU_DIED1.png");
-	Texture		death_texture2 = LoadTexture("Assets/YOU_DIED2.png");
+	Texture2D	death_texture1 = data->textures.screens[2];
+	Texture2D	death_texture2 = data->textures.screens[3];
 
 	Rectangle	play_again_b = {4, 72, 40, 9};
 	bool		new_highscore = 0;
@@ -104,7 +101,5 @@ int	death_main(t_data *data)
 	}
 	if (new_highscore)
 		printf("NEW HIGHSCORE\n");
-	UnloadTexture(death_texture1);
-	UnloadTexture(death_texture2);
 	return (current_screen);
 }

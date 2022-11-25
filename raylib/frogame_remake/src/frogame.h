@@ -4,9 +4,9 @@
 # include "stdio.h"
 # include "fcntl.h"
 # include "./../../../libft/libft.h"
-# define G 400
-# define JUMP_SPEED 350.0f
-# define SPEED 200.0f
+# define WALL 'x'
+# define NOTHING '0'
+# define LIGHT_SWITCH 'l'
 
 typedef enum e_game_screen {MENU, CREDITS, GAMEPLAY, DEATH, EXIT_GAME} t_screen;
 typedef enum e_entities_types {WORLD, INTERACTABLE, PLAYER, ENEMYS} t_entities_type;
@@ -43,20 +43,6 @@ typedef struct s_entities {
     int			blocking;
 } t_entities;
 
-typedef struct s_data
-{
-	t_player	player;
-	t_entities	*ent_lst;
-	bool		is_dark;
-	Camera2D	camera;
-	int			time_dark;
-	int			score;
-	int			highscore;
-	int			win_height;
-	int			win_width;
-	float		win_scale;
-} t_data;
-
 typedef struct s_block {
 	t_entities_type	type;
     Rectangle	hitbox;
@@ -64,11 +50,35 @@ typedef struct s_block {
 	Texture2D	*texture;
 } t_block;
 
+typedef struct s_textures {
+	Texture2D	player_sheet[2];
+	Texture2D	bat_sheet;
+	Texture2D	block;
+	Texture2D	spikes;
+	Texture2D	screens[4];
+	Texture2D	death_anim[8];
+	Texture2D	lights_out[4];
+	Texture2D	ligth_switch[2];
+} t_textures;
+
 typedef struct s_map
 {
 	Vector2	sz;
 	char	**map;
 } t_map;
+
+typedef struct s_data
+{
+	t_textures	textures;
+	t_entities	*ent_lst;
+	Camera2D	camera;
+	int			is_dark;
+	int			score;
+	int			highscore;
+	int			win_height;
+	int			win_width;
+	float		win_scale;
+} t_data;
 
 int	menu_main(t_data *data);
 int	credit_main(t_data *data);

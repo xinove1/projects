@@ -1,18 +1,16 @@
 #include "frogame.h"
-# define WALL 'x'
-# define NOTHING '0'
-# define LIGTH_SWITCH 'l'
 
 static Vector2	count_map_size(char **map);
 static char	**fill_map(char *file);
 static int	check_line(char *line);
-char *gnl(int fd);
 
 t_map parse_map(char *file)
 {
 	t_map	map;
 
 	map.map = fill_map(file);
+	if (!map.map)
+		return ((t_map){{0,0}, NULL});
 	map.sz = count_map_size(map.map);
 	if (map.sz.x <= 0 || map.sz.y <= 0)
 	{
@@ -53,7 +51,7 @@ static int	check_line(char *line)
 	while (line[i++])
 	{
 		char c = line[i];
-		if (c != WALL && c != NOTHING && c != LIGTH_SWITCH)
+		if (c != WALL && c != NOTHING && c != LIGHT_SWITCH)
 		{
 			ft_printf("Unknow character on map: %c.\n", c);
 			return (0);

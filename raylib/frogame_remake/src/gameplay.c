@@ -1,34 +1,34 @@
 #include "frogame.h"
+#include <raylib.h>
 #define MAX_FRAME_SPEED     15
 #define MIN_FRAME_SPEED      1
 
 static void		player_animation(t_player *player, bool time_dark);
 static void		bat_animation(t_bat *bat, bool time_dark);
-static t_player	init_player();
-static t_bat	init_bat();
+static t_player	init_player(t_textures textures);
+static t_bat	init_bat(t_textures textures);
 
 int	gameplay_main(t_data *data)
 {
 	t_screen	current_screen = GAMEPLAY;
-	t_player	player = init_player();
-	t_bat		bat = init_bat();
-
-	data->player = player;
+	t_player	player = init_player(data->textures);
+	t_bat		bat = init_bat(data->textures);
 
     while (current_screen == GAMEPLAY)
     {
         // Update
-        player_animation(&player, data->time_dark);
-        bat_animation(&bat, data->time_dark);
+        player_animation(&player, data->is_dark);
+        bat_animation(&bat, data->is_dark);
 
 		if (WindowShouldClose())
 			current_screen = EXIT_GAME;
 		if (IsKeyPressed(KEY_SPACE))
 		{
-			if (data->time_dark)
-				data->time_dark = 0;
+			SetTargetFPS(30);
+			if (data->is_dark)
+				data->is_dark = 0;
 			else
-				data->time_dark = 1;
+				data->is_dark = 1;
 		}
 		if (IsKeyPressed(KEY_A))
 			player.dir.x = -1;
@@ -39,8 +39,9 @@ int	gameplay_main(t_data *data)
         BeginDrawing();
 		ClearBackground(RAYWHITE);
 		BeginMode2D(data->camera);
-				DrawTextureRec(player.texture, player.frame, player.position, WHITE);
+			DrawTextureRec(player.texture, player.frame, player.position, WHITE);
 			if (bat.blocking) DrawTextureRec(bat.texture, bat.frame, bat.position, WHITE);
+			DrawTexture(data->textures.block, 10, 20, WHITE);
 		EndMode2D();
         EndDrawing();
     }
@@ -59,7 +60,7 @@ static void	player_animation(t_player *player, bool time_dark)
 	frames_counter++;
 
 	//NOTE frame rate of the animation is expecting 60 fps
-	if (frames_counter >= (60 / frames_speed))
+	if (frames_counter >= (GetFPS() / frames_speed))
 	{
 		frames_counter = 0;
 		current_frame++;
@@ -132,7 +133,7 @@ static void	bat_animation(t_bat *bat, bool time_dark)
 	//printf("frameSpeed: %d \n", frames_speed);
 }
 
-static t_player	init_player()
+static t_player	init_player(t_textures textures)
 {
 	t_player player;
 	player.position = (Vector2){20, 20};
@@ -142,20 +143,20 @@ static t_player	init_player()
 	player.on_wall = 0;
 	player.speed = 20;
 	player.type = PLAYER;
-	player.sheet[0] = LoadTexture("Assets/Sprites/Player/MOVIMENTOS_SAPO_ON.png");
-	player.sheet[1] = LoadTexture("Assets/Sprites/Player/MOVIMENTOS_SAPO_OFF.png");
+	player.sheet[0] = textures.player_sheet[0];
+	player.sheet[1] = textures.player_sheet[0];
 	player.frame = (Rectangle) {0, 0, 0, 0};
 	return player;
 }
 
-static t_bat	init_bat()
+static t_bat	init_bat(t_textures textures)
 {
 	t_bat	bat;
 
 	bat.type = ENEMYS;
 	//bat.hitbox =   ;
 	bat.blocking = 1;
-	bat.texture = LoadTexture("Assets/Sprites/INIMIGO_SHEET.png");
+	bat.texture = textures.bat_sheet;
 	bat.frame = (Rectangle){0, 0, 0, 0};
 	bat.position = (Vector2){20, 50};
 	bat.speed = 1;
