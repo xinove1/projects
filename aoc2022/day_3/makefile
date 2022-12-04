@@ -1,5 +1,5 @@
-name = day1
-SRC = day1.c
+name = day3
+SRC = day3.c
 
 all:
 	gcc $(SRC) -llibft -o $(name)

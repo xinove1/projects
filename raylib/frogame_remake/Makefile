@@ -9,7 +9,7 @@ LIBFT = ./../../libft
 
 CC= gcc
 
-CFLAGS= -lraylib -g3 -lGL -lm -lpthread -ldl -lrt -lX11 -fsanitize=address
+CFLAGS= -lraylib -g3 -lGL -lm -lpthread -ldl -lrt -lX11 #-fsanitize=address
 
 RM= rm -f
 

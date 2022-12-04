@@ -19,7 +19,7 @@ int	main()
 	top2_calories = 0;
 	top3_calories = 0;
 	current_calories = 0;
-	do
+	while (line)
 	{
 		int calories = ft_atoi(line);
 		if (calories == 0)
@@ -43,7 +43,7 @@ int	main()
 			current_calories += calories;
 		free(line);
 		line = get_next_line(fd);
-	} while (line);
+	}
 	printf("Max calories (top1): %d\n", top1_calories);
 	printf("Top 2 calories: %d\n", top2_calories);
 	printf("Top 3 calories: %d\n", top3_calories);
