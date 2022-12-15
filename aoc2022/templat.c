@@ -10,9 +10,9 @@ int	main()
 
 	fd = open("input", O_RDONLY);
 	line = get_next_line(fd);
-	do
+	while (line);
 	{
 		free(line);
 		line = get_next_line(fd);
-	} while (line);
+	}
 }
