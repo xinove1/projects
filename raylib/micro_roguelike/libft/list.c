@@ -1,0 +1,117 @@
+#include "libft.h"
+
+List	*lstnew(void *content)
+{
+	List	*new;
+
+	new = malloc(sizeof(List));
+	if (!new)
+		return (NULL);
+	new->content = content;
+	new->next = NULL;
+	return (new);
+}
+
+void	lstadd_back(List **list, List *new)
+{
+	List	*i;
+
+	if (!*list)
+		*list = new;
+	else
+	{
+		i = lstlast(*list);
+		i->next = new;
+	}
+}
+
+void	lstadd_front(List **lst, List *new)
+{
+	new->next = *lst;
+	*lst = new;
+}
+
+void	lstiter(List *lst, void (*f)(void *))
+{
+	List	*i;
+
+	i = lst;
+	while (i)
+	{
+		f(i->content);
+		i = i->next;
+	}
+}
+
+List	*lstlast(List *lst)
+{
+	List	*i;
+
+	if (!lst)
+		return (NULL);
+	i = lst;
+	while (i->next)
+		i = i->next;
+	return (i);
+}
+
+int	lstsize(List *lst)
+{
+	int		i;
+	List	*j;
+
+	i = 0;
+	j = lst;
+	while (j)
+	{
+		j = j->next;
+		i++;
+	}
+	return (i);
+}
+
+void	lstclear(List **lst, void (*del)(void*))
+{
+	List	*tmp;
+
+	if (!lst)
+		return ;
+	while (*lst)
+	{
+		tmp = (*lst)->next;
+		if (del != NULL) // NOTE modification from original
+			lstdelone(*lst, del);
+		*lst = tmp;
+	}
+	lst = NULL;
+}
+
+void	lstdelone(List *lst, void (*del)(void*))
+{
+	del(lst->content);
+	free(lst);
+}
+
+List	*lstmap(List *lst, void *(*f)(void *), void (*del)(void *))
+{
+	List	*i;
+	List	*newlst;
+	List	*tmp;
+
+	if (!lst)
+		return (NULL);
+	newlst = lstnew(f(lst->content));
+	i = lst->next;
+	while (i)
+	{
+		tmp = lstnew(f(i->content));
+		if (!tmp)
+		{
+			lstclear(&newlst, del);
+			return (NULL);
+		}
+		lstadd_back(&newlst, tmp);
+		i = i->next;
+	}
+	return (newlst);
+}

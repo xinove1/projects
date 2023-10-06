@@ -33,7 +33,7 @@ int main(void)
 
 static void	init_config()
 {
-	config.screen_height = 1300;
+	config.screen_height = 720;
 	config.screen_width = 1000;
 	config.target_fps = 60;
 	config.window_title = "Micro rpg";
@@ -41,22 +41,34 @@ static void	init_config()
 
 static void	init_data()
 {
-	data.background.size = (Vector2) {10, 10};
-	data.background.map = calloc(data.background.size.y, sizeof(GameTile *));
-	for (int i = 0; i < data.background.size.y; i++)
+	data.map.size = (Vector2) {25, 20};
+	data.map.tiles = calloc(data.map.size.y, sizeof(int *));
+	data.map.interactives = calloc(data.map.size.y, sizeof(int *));
+	for (int i = 0; i < data.map.size.y; i++)
 	{
-		data.background.map[i] = calloc(data.background.size.x, sizeof(GameTile));
-		for (int x = 0; x < data.background.size.x; x++)
-			data.background.map[i][x].tile = 17; // TODO change to const or macro
+		data.map.tiles[i] = calloc(data.map.size.x, sizeof(int));
+		data.map.interactives[i] = calloc(data.map.size.x, sizeof(int));
+		for (int x = 0; x < data.map.size.x; x++)
+		{
+			data.map.tiles[i][x] = TILE_DEFAULT; // TODO change to const or macro
+			data.map.interactives[i][x] = 0;
+		}
 	}
 
     data.camera = (Camera2D){0};
     data.camera.zoom = 2.0f;
-	data.camera.target = (Vector2){data.background.size.x / 2.0f, data.background.size.y / 2.0f};
+	data.camera.target = (Vector2){data.map.size.x / 2.0f, data.map.size.y / 2.0f};
 	data.camera.offset = (Vector2){config.screen_width / 2.0f, config.screen_height / 2.0f};
 
 	data.tile_selector = (TileSelector){0};
 	data.tile_selector.painting = true;
 	data.tile_selector.tile = 15;
 	data.tile_selector.render_scale = 4;
+
+	data.draw_collisions = true;
+
+	data.player.pos = (Vector2){4,5};
+	data.player.health = 4;
+	set_array(data.map.interactives, data.player.pos, PLAYER);
+	spawn_enemy(4, (Vector2) {10,10});
 }
