@@ -4,10 +4,12 @@ List	*lstnew(Arena *arena, void *content)
 {
 	List	*new;
 
-	if (arena->chunk_sz)
+	if (!arena)
+		new = calloc(1, sizeof(List));
+	else if (arena->chunk_sz)
 		new = pool_alloc(arena);
 	else
-		new = linear_alloc(arena, sizeof(List)); // TODO replace with arena
+		new = linear_alloc(arena, sizeof(List));
 	if (!new)
 		return (NULL);
 	new->content = content;

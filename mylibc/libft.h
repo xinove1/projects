@@ -3,8 +3,6 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <assert.h>
 
 # ifndef ARENA_BLOCK_SIZE
