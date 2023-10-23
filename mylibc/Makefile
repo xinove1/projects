@@ -26,6 +26,11 @@ windows: $(SRC) libft.h
 	# $(WINDOWS_TOOLS)-ar rc $(NAME) $(OBJ)
 	# $(WINDOWS_TOOLS)-ranlib $(NAME)
 
+web: $(SRC) libft.h
+	emcc $(CFLAGS) -c $(SRC)
+	emar rc $(NAME) $(OBJ)
+	emranlib $(NAME)
+
 test: all
 	$(CC) tests.c $(NAME) -fsanitize=address -o tests
 	./tests
