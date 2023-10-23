@@ -55,6 +55,11 @@ windows: clean $(SRC) flecs.h
 	x86_64-w64-mingw32-ar rc $(NAME) $(OBJ)
 	x86_64-w64-mingw32-ranlib $(NAME)
 
+web: $(SRC) flecs.h
+	emcc -std=gnu99 -Dflecs_EXPORTS -Dflecs_STATIC  -c $(SRC)
+	emar rc $(NAME) $(OBJ)
+	emranlib $(NAME)
+
 all: $(NAME)
 
 clean:

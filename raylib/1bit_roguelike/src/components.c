@@ -8,6 +8,7 @@ ECS_COMPONENT_DECLARE(FlashColor);
 ECS_COMPONENT_DECLARE(Attack);
 ECS_COMPONENT_DECLARE(Arr2D);
 ECS_COMPONENT_DECLARE(Path);
+ECS_COMPONENT_DECLARE(TimerDeath);
 
 ECS_TAG_DECLARE(Despawn);
 ECS_TAG_DECLARE(Player);
@@ -61,6 +62,18 @@ void	init_ecs()
 
 	// Draw Systems
 	ECS_SYSTEM(ecs, render_tiles, OnDraw2D, Position, Tile);
+	// TODO test system
+	ecs_entity_t raycast_test = ecs_system(ecs, {
+		.entity = ecs_entity(ecs,{
+			.name =  "test",
+			.add  = {ecs_dependson(OnDraw2D)}
+		}),
+		/* .query.filter.terms = { */
+		/* 	{ecs_id(Attack)} */
+		/* }, */
+		.callback = test_raycast,
+		.ctx = colliders
+	});
 	ECS_SYSTEM(ecs, render_health, OnDraw2D, Position, Health);
 	ECS_SYSTEM(ecs, flash_color, OnDraw2D, Position, Tile, FlashColor);
 	ECS_SYSTEM(ecs, render_ui, OnDraw, 0);
@@ -95,6 +108,7 @@ void	init_ecs()
 		.ctx = colliders_health
 	});
 
+
 	ecs_observer(ecs, {
 		.filter.terms = { { ecs_id(Collider)}},
     .events = EcsOnAdd,
@@ -118,6 +132,7 @@ void	init_ecs()
 
 	ECS_SYSTEM(ecs, render_colliders_map, OnDraw2D, 0);
 	ECS_SYSTEM(ecs, render_pathfind, OnDraw2D, Path);
+	ECS_SYSTEM(ecs, tick_deathtimer, OnUpdate, TimerDeath);
 
 	ecs_entity_t	map = ecs_entity(ecs, { .name = "GameMap" });
 	ecs_set(ecs, map, Arr2D, {NULL});
@@ -192,6 +207,7 @@ static void	 setup_components(ecs_world_t *ecs)
 	ECS_COMPONENT_DEFINE(ecs, Attack);
 	ECS_COMPONENT_DEFINE(ecs, Arr2D);
 	ECS_COMPONENT_DEFINE(ecs, Path);
+	ECS_COMPONENT_DEFINE(ecs, TimerDeath);
 }
 
 static void	 setup_phases(ecs_world_t *ecs)

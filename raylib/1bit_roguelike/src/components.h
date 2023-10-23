@@ -15,6 +15,7 @@ typedef Vector2	Dir;
 typedef int Tile;
 typedef int Health;
 typedef int **Arr2D;
+typedef float TimerDeath;
 
 typedef struct
 {
@@ -49,6 +50,7 @@ extern ECS_COMPONENT_DECLARE(FlashColor);
 extern ECS_COMPONENT_DECLARE(Attack);
 extern ECS_COMPONENT_DECLARE(Arr2D);
 extern ECS_COMPONENT_DECLARE(Path);
+extern ECS_COMPONENT_DECLARE(TimerDeath);
 
 // Tags
 extern ECS_TAG_DECLARE(Despawn);

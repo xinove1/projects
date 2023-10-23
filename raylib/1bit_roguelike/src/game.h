@@ -6,6 +6,9 @@
 # include "../../../../raylib/src/raylib.h"
 # include "../../../../raylib/src/raymath.h"
 # include "raygui.h"
+# if defined(PLATFORM_WEB)
+#  include <emscripten/emscripten.h>
+# endif
 
 typedef struct
 {
@@ -45,6 +48,7 @@ void	move(ecs_iter_t *it);
 void	attack(ecs_iter_t *it);
 void	despawn(ecs_iter_t *it);
 void	on_new_collider(ecs_iter_t *it);
+ecs_entity_t	*check_collision(Position target, ecs_query_t *colliders_query, ecs_world_t *it_world);
 
 // Render
 void	render_ui(ecs_iter_t *it);
@@ -58,8 +62,11 @@ void	flash_color(ecs_iter_t *it);
 
 // Erhm
 Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, int **map);
+ecs_entity_t	*raycast_entity(Vector2 origin, Vector2 dir, int lenght, ecs_query_t *entitys, ecs_world_t *world);
 void	pathfind(ecs_iter_t *it);
 List	*pathfind_breadth_first(Arena *arena, Arena *scratch, int **grid, Vector2 grid_size, Vector2 starting_pos, Vector2 goal);
+void	test_raycast(ecs_iter_t	*it);
+void	tick_deathtimer(ecs_iter_t *it);
 
 // Utils
 int		get_array(int	**array, Vector2 pos);

@@ -14,6 +14,8 @@ CFLAGS= -fsanitize=address #-Wall -Wextra -Werror
 RFLAGS= -lGL -lm -lpthread -ldl -lrt -lX11
 RFLAGS_WINDOWS= -lopengl32 -lgdi32 -lwinmm
 
+WEBFLAGS = --preload-file assets -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=cwrap -s ASYNCIFY -Os -s USE_GLFW=3 -DPLATFORM_WEB
+
 RM= rm -f
 
 SRC= main.c render.c update.c components.c map.c pathfinding.c utils.c raycast.c
@@ -39,6 +41,14 @@ windows: $(addprefix src/, $(SRC)) src/components.h src/game.h
 	@make -C $(RAYLIB) OS=Windows_NT CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar
 	$(CC_WINDOWS) -c $(addprefix src/, $(SRC))
 	$(CC_WINDOWS) $(OBJ) $(MY_LIB)/mylib.a $(FLECS)/flecs.a $(RAYLIB)/libraylib.a $(RFLAGS_WINDOWS) -o $(NAME).exe
+
+web: $(addprefix src/, $(SRC)) src/components.h src/game.h
+	make -C $(RAYLIB) PLATFORM=PLATFORM_WEB -B
+	make -C $(FLECS) web
+	make -C $(MY_LIB) web
+	emcc $(CFLAGS) -c $(addprefix src/, $(SRC))
+	emcc $(OBJ)  $(MY_LIB)/mylib.a $(FLECS)/flecs.a $(RAYLIB)/libraylib.a -I$(RAYLIB) $(CFLAGS) $(RFLAGS) $(WEBFLAGS) -o $(NAME).html
+#emcc -o game.html game.c -Os -Wall ./path-to/libraylib.a -I. -Ipath-to-raylib-h -L. -Lpath-to-libraylib-a  --shell-file path-to/shell.html
 
 windows_test:  $(addprefix src/, $(SRC)) src/components.h src/game.h
 	@make -C $(MY_LIB) windows

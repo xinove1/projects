@@ -2,6 +2,7 @@
 #include "game.h"
 
 static void	init_config();
+void	UpdateDrawFrame(void);
 
 Config	config = {0};
 Data		data = {0};
@@ -22,14 +23,19 @@ int main(void)
 	// Raylib inici
 	InitWindow(config.screen_width, config.screen_height, config.window_title);
 	SetExitKey(KEY_NULL);
+	data.tilemap = LoadTexture("assets/Tilesheet/colored-transparent_packed.png");
 	SetTargetFPS(config.target_fps);
 
 	//ECS_SYSTEM(data.ecs, render_tiles, OnDraw, Position, Tile);
-	data.tilemap = LoadTexture("assets/Tilesheet/colored-transparent_packed.png");
 	while (ecs_progress(data.ecs, GetFrameTime()) && !WindowShouldClose()) ;
 	CloseWindow();
-	// De-init
-  return 0;
+	ecs_fini(data.ecs);
+	return 0;
+}
+
+void	UpdateDrawFrame(void)
+{
+	ecs_progress(data.ecs, GetFrameTime());
 }
 
 static void	init_config()
