@@ -57,6 +57,46 @@ void	flash_color(ecs_iter_t *it)
 	}
 }
 
+void	render_colliders_map(ecs_iter_t	*it)
+{
+	ecs_entity_t	game_map = ecs_lookup(it->world, "GameMap");
+	const Arr2D	*map = ecs_get(it->world, game_map, Arr2D);
+	if (map->arr == NULL)
+	{
+		printf("Tryng to render a empty map \n");
+		return ;
+	}
+	for (int y = 0; y < map->size.y; y++)
+	{
+		for (int x = 0; x < map->size.x; x++)
+		{
+			if (map->arr[y][x] == 0)
+				continue;
+			Position	d_pos = (Position) {x * TILE_SZ, y * TILE_SZ};
+			DrawRectangle(d_pos.x, d_pos.y, TILE_SZ, TILE_SZ, ColorAlpha(RED, 0.3));
+		}
+	}
+}
+
+void	render_path(ecs_iter_t *it)
+{
+	Path	*path = ecs_field(it, Path, 1);
+
+	for (int i = 0; i < it->count; i++)
+	{
+		if (!path[i].current)
+			continue;
+		List	*lst = path[i].current;
+		while (lst)
+		{
+			Vector2		*v = lst->content;
+			Position	d_pos = (Position) {v->x * TILE_SZ, v->y * TILE_SZ};
+			DrawRectangle(d_pos.x, d_pos.y, TILE_SZ, TILE_SZ, ColorAlpha(BLUE, 0.3));
+			lst = lst->next;
+		}
+	}
+}
+
 void	prepare_draw(ecs_iter_t	*it)
 {
 	(void) it;

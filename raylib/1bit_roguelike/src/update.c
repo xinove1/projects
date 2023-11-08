@@ -13,7 +13,6 @@ void	test_raycast(ecs_iter_t	*it)
 	{
 		ecs_entity_t	tile = ecs_new_id(it->world);
 		Position pos = Vector2ToPos(mouse_pos_tiled);
-		printf("pos: %d,%d\n", pos.x, pos.y);
 		ecs_set(it->world, tile, Position, {pos.x, pos.y});
 		ecs_set(it->world, tile, Tile, {49});
 		ecs_add(it->world, tile, Collider);
@@ -42,11 +41,10 @@ void	test_raycast(ecs_iter_t	*it)
 		ecs_entity_t	player = ecs_lookup(it->world, "Player");
 		const Position	* pos_p =ecs_get(it->world, player, Position);
 		pos = PosToVector2(*pos_p);
-	ecs_entity_t	game_map = ecs_lookup(it->world, "GameMap");
-	const Arr2D	*arr = ecs_get(it->world, game_map, Arr2D);
-	int	**map = *arr;
+		ecs_entity_t	game_map = ecs_lookup(it->world, "GameMap");
+		const Arr2D	*map = ecs_get(it->world, game_map, Arr2D);
 		pos = (Vector2) {pos.x + 0.5f, pos.y + 0.5f};
-		target = raycast((Vector2) {pos.x, pos.y}, Vector2Normalize(Vector2Subtract(mouse_pos_tiled, pos)), 10, map);
+		target = raycast((Vector2) {pos.x, pos.y}, Vector2Normalize(Vector2Subtract(mouse_pos_tiled, pos)), 10, *map);
 	}
 	if (Vector2Compare(target,  Vector2Zero()))
 		DrawLine(pos.x * TILE_SZ, pos.y * TILE_SZ, mouse_pos.x, mouse_pos.y, GREEN);
@@ -66,18 +64,52 @@ void	tick_deathtimer(ecs_iter_t *it)
 	}
 }
 
+void	game_loop(ecs_iter_t	*it)
+{
+	EnergyLevel	*energy = ecs_field(it, EnergyLevel, 1);
+
+	bool	*player_action_wait = ecs_get_mut(it->world, ecs_lookup(it->world, "PlayerAction"), Bool);
+	if (*player_action_wait)
+		return ;
+	printf("it->count %d\n", it->count);
+	for (int i = 0; i < it->count; i++)
+	{
+		energy[i].current += energy[i].increment;
+		if (energy[i].current >= ENERGY_THRESHOLD)
+		{
+			//printf("entity energy: %s, %d\n", ecs_get_name(it->world, it->entities[i]), energy[i].current);
+			printf("%d\n", energy[i].current);
+			if (ecs_has_id(it->world, it->entities[i], Player))
+			{
+				*player_action_wait = true;
+			}
+			else
+			{
+
+			}
+			energy[i].current -= ENERGY_THRESHOLD;
+		}
+	}
+}
+
 void	input_player(ecs_iter_t *it)
 {
-	Dir	*dir = ecs_field(it, Dir, 1);
+	bool	*player_action_wait = ecs_get_mut(it->world, ecs_lookup(it->world, "PlayerAction"), Bool);
+	if (!*player_action_wait)
+		return ;
+	ecs_entity_t	player = ecs_lookup(it->world, "Player");
+	Dir		*dir = ecs_get_mut(it->world, player, Dir);
 
 	if (IsKeyPressed(KEY_A))
-		dir[0].x = -1;
+		dir->x = -1;
 	else if (IsKeyPressed(KEY_D))
-		dir[0].x = 1;
+		dir->x = 1;
 	else if (IsKeyPressed(KEY_W))
-		dir[0].y = -1;
+		dir->y = -1;
 	else if (IsKeyPressed(KEY_S))
-		dir[0].y = 1;
+		dir->y = 1;
+	if (dir->x != 0 || dir->y != 0)
+		*player_action_wait = false;
 }
 
 void	camera_follow_player(ecs_iter_t *it)

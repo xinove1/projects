@@ -10,12 +10,18 @@ typedef struct
 	int	y;
 } Vector2Int;
 
+typedef Vector2Int Position;
 typedef Vector2	Dir;
 
-typedef int Tile;
+typedef bool Bool;
 typedef int Health;
-typedef int **Arr2D;
 typedef float TimerDeath;
+
+typedef struct
+{
+	int	**arr;
+	Vector2	size;
+} Arr2D;
 
 typedef struct
 {
@@ -25,8 +31,14 @@ typedef struct
 	List	*current;
 } Path;
 
-typedef Vector2Int Position;
+typedef struct
+{
+	int	current;
+	int	increment;
+}EnergyLevel;
 
+
+typedef int Tile;
 typedef struct
 {
 	float	duration;
@@ -51,9 +63,10 @@ extern ECS_COMPONENT_DECLARE(Attack);
 extern ECS_COMPONENT_DECLARE(Arr2D);
 extern ECS_COMPONENT_DECLARE(Path);
 extern ECS_COMPONENT_DECLARE(TimerDeath);
+extern ECS_COMPONENT_DECLARE(EnergyLevel);
+extern ECS_COMPONENT_DECLARE(Bool);
 
 // Tags
-extern ECS_TAG_DECLARE(Despawn);
 extern ECS_TAG_DECLARE(Despawn);
 extern ECS_TAG_DECLARE(Player);
 extern ECS_TAG_DECLARE(Enemy);
@@ -61,9 +74,13 @@ extern ECS_TAG_DECLARE(Collider);
 extern ECS_TAG_DECLARE(Despawn);
 extern ECS_TAG_DECLARE(TargetFollow);
 
+// Systems
+//extern ECS_SYSTEM_DECLARE(id);
+
 // Ids
 extern ECS_DECLARE(PreUpdate);
 extern ECS_DECLARE(OnUpdate);
+extern ECS_DECLARE(OnUpdateReal);
 extern ECS_DECLARE(PostUpdate);
 extern ECS_DECLARE(PreDraw);
 extern ECS_DECLARE(PreDraw2D);

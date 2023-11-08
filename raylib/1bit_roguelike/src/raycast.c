@@ -1,7 +1,7 @@
 #include "game.h"
 
 // TODO clean from debug stuff
-Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, int **map)
+Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, Arr2D map)
 {
 	Vector2	step_size = {sqrt(1 + (dir.y / dir.x) * (dir.y / dir.x)), sqrt(1 + (dir.x / dir.y) * (dir.x / dir.y))};
 	/* Vector2	step_size = {sqrt(1 + (dir.y * dir.y) / (dir.x / dir.x)), sqrt(1 + (dir.x * dir.x) / (dir.y * dir.y))}; */
@@ -52,7 +52,7 @@ Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, int **map)
 			raylenght.y += step_size.y;
 		}
 		Position	icurrent = Vector2ToPos(current);
-		if (icurrent.x < 0 || icurrent.x >= data.map_bounds.x || icurrent.y < 0 || icurrent.y >= data.map_bounds.y)
+		if (icurrent.x < 0 || icurrent.x >= map.size.x || icurrent.y < 0 || icurrent.y >= map.size.y)
 			break ;
 		//printf("icurrent: %d,%d\n", icurrent.x, icurrent.y);
 		{
@@ -61,7 +61,7 @@ Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, int **map)
 			/* ecs_set(data.ecs, t, Tile, {50}); */
 			/* ecs_set(data.ecs, t, TimerDeath, {4}); */
 		}
-		if (map[icurrent.y][icurrent.x] == 1)
+		if (map.arr[icurrent.y][icurrent.x] == 1)
 		{
 			Vector2 r = Vector2Add(origin, Vector2Scale(dir, distance));
 			/* printf("distance %f\n", distance); */

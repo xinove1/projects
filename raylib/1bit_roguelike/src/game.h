@@ -33,17 +33,20 @@ extern Data		data;
 
 # define TILEMAP_SZ  (Vector2) {49, 22}
 # define TILE_SZ  16
+# define ENERGY_THRESHOLD 10
+# define COLLISION 1
 
 void	init_ecs();
 
 // Map
-void	render_pathfind(ecs_iter_t *it);
+void	render_path(ecs_iter_t *it);
 void	render_colliders_map(ecs_iter_t	*it);
 void	fill_map(ecs_world_t *world, ecs_query_t	*colliders, ecs_entity_t	game_map);
 
 // Update
-void	camera_follow_player(ecs_iter_t *it);
 void	input_player(ecs_iter_t *it);
+void	game_loop(ecs_iter_t	*it);
+void	camera_follow_player(ecs_iter_t *it);
 void	move(ecs_iter_t *it);
 void	attack(ecs_iter_t *it);
 void	despawn(ecs_iter_t *it);
@@ -61,10 +64,11 @@ void	end_draw(ecs_iter_t *it);
 void	flash_color(ecs_iter_t *it);
 
 // Erhm
-Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, int **map);
+Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, Arr2D map);
 ecs_entity_t	*raycast_entity(Vector2 origin, Vector2 dir, int lenght, ecs_query_t *entitys, ecs_world_t *world);
 void	pathfind(ecs_iter_t *it);
-List	*pathfind_breadth_first(Arena *arena, Arena *scratch, int **grid, Vector2 grid_size, Vector2 starting_pos, Vector2 goal);
+void	pathfind_a_star(Path *path, Vector2 start, Vector2 target, Arr2D map);
+List	*pathfind_breadth_first(Arena *arena, Arena *scratch, Arr2D grid, Vector2 grid_size, Vector2 starting_pos, Vector2 goal);
 void	test_raycast(ecs_iter_t	*it);
 void	tick_deathtimer(ecs_iter_t *it);
 

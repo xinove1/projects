@@ -9,7 +9,9 @@ FLECS= ./flecs
 CC= gcc
 CC_WINDOWS= x86_64-w64-mingw32-gcc
 
-CFLAGS= -fsanitize=address #-Wall -Wextra -Werror
+CFLAGS=  #-Wall -Wextra -Werror
+
+DEBUG_FLAGS= -fsanitize=address -g
 
 RFLAGS= -lGL -lm -lpthread -ldl -lrt -lX11
 RFLAGS_WINDOWS= -lopengl32 -lgdi32 -lwinmm
@@ -18,15 +20,15 @@ WEBFLAGS = --preload-file assets -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_ME
 
 RM= rm -f
 
-SRC= main.c render.c update.c components.c map.c pathfinding.c utils.c raycast.c
+SRC= main.c render.c update.c components.c map.c pathfinding.c utils.c raycast.c a_star.c
 
 OBJ=$(SRC:.c=.o)
 
 $(NAME): $(addprefix src/, $(SRC)) src/components.h src/game.h
 	@make -C $(MY_LIB)
 	@make -C $(FLECS)
-	$(CC) $(CFLAGS) -c $(addprefix src/, $(SRC))
-	$(CC) $(OBJ) $(MY_LIB)/mylib.a $(FLECS)/flecs.a $(CFLAGS) -lraylib $(RFLAGS) -o $(NAME)
+	$(CC) $(CFLAGS) $(DEBUG_FLAGS) -c $(addprefix src/, $(SRC))
+	$(CC) $(OBJ) $(MY_LIB)/mylib.a $(FLECS)/flecs.a $(CFLAGS) $(DEBUG_FLAGS) -lraylib $(RFLAGS) -o $(NAME)
 
 static: $(addprefix src/, $(SRC)) src/components.h src/game.h
 	@make -C $(MY_LIB)
@@ -56,6 +58,9 @@ windows_test:  $(addprefix src/, $(SRC)) src/components.h src/game.h
 	@make -C $(RAYLIB) OS=Windows_NT CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar
 	x86_64-w64-mingw32-gcc -c $(addprefix src/, $(SRC))
 	x86_64-w64-mingw32-gcc $(OBJ) $(MY_LIB)/mylib.a $(FLECS)/flecs.a ../../../raylib/src/libraylib.a  -lopengl32 -lgdi32 -lwinmm -o $(NAME).exe
+
+e: $(NAME)
+	./$(NAME)
 
 all: $(NAME)
 
