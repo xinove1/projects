@@ -25,8 +25,7 @@ typedef struct
 
 typedef struct
 {
-	Arena	*memL;
-	Arena	*memV;
+	Arena	*mem;
 	List	*head;
 	List	*current;
 } Path;

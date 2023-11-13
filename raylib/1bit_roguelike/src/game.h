@@ -75,6 +75,7 @@ void	tick_deathtimer(ecs_iter_t *it);
 // Utils
 int		get_array(int	**array, Vector2 pos);
 void	set_array(int	**array, Vector2 pos, int new_value);
+void	print_arr2d(Arr2D arr);
 int		Vector2Compare(Vector2 vec1, Vector2 vec2);// NOTE rename?
 Position	Vector2ToPos(Vector2 v);
 Vector2		PosToVector2(Position p);

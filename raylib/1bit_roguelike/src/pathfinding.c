@@ -1,6 +1,5 @@
 #include "game.h"
 
-void	pathfind_build(Path *path, Arr2D map, Vector2 start_pos, Vector2 target);
 static List	*lstfind_pos(List *list, Vector2 *content);
 static Vector2	**get_neighbors(Arena *arena, Arr2D grid, Vector2 pos);
 
@@ -10,7 +9,6 @@ void	pathfind(ecs_iter_t *it)
 	Path		*path = ecs_field(it, Path, 2);
 	const Arr2D	*map = ecs_get(it->world, ecs_lookup(it->world, "GameMap"), Arr2D);
 
-
 	for (int i = 0; i < it->count; i++)
 	{
 		ecs_entity_t	target_entity = ecs_get_target(it->world, it->entities[i], TargetFollow, 0);
@@ -19,41 +17,12 @@ void	pathfind(ecs_iter_t *it)
 		//Position	*target = (Position *) ecs_field(it, Target, 2);
 		/* if (!IsKeyPressed(KEY_M)) */
 		/* 	return ; */
-		printf("AAA\n");
-		if (path[i].memL == NULL)
-			path[i].memL = arena_create_sized(sizeof(List) + sizeof(Vector2), 10);
-		if (path[i].memV == NULL)
-			path[i].memV = arena_create_sized(0, 10);
-		arena_clean(path[i].memV);
-		arena_clean(path[i].memL);
+		if (path[i].mem == NULL)
+			path[i].mem = arena_create_sized(sizeof(List) + sizeof(Vector2), 10);
+		arena_clean(path[i].mem);
 		pathfind_a_star(&path[i], PosToVector2(pos[i]), PosToVector2(*target_pos), *map);
-		//pathfind_a_star(&path[i], PosToVector2(pos[i]), Vector2Add(PosToVector2(pos[i]), (Vector2){5,5}), *map);
-		//pathfind_build(&path[i], *map, (Vector2) {pos[i].x, pos[i].y}, (Vector2) {target_pos->x, target_pos->y});
-		//ecs_remove(it->world, it->entities[i], Target);
 	}
 }
-
-void	pathfind_build(Path *path, Arr2D map, Vector2 start_pos, Vector2 target)
-{
-	Arena	*scratch = arena_create_sized(sizeof(List), 20);
-	List	*list = pathfind_breadth_first(path->memV, scratch, map, data.map_bounds, start_pos, target);
-	List	*current_node = lstfind_pos(list, &target);
-	List	*path_list = lstnew(path->memL, current_node->content);
-
-	while (current_node)
-	{
-		Vector2	from = ((Vector2 *)current_node->content)[1];
-		Vector2	current = ((Vector2 *)current_node->content)[0];
-		lstadd_front(&path_list, lstnew(path->memL, current_node->content));
-		if (from.x == -1)
-			break ;
-		current_node = lstfind_pos(list, &from);
-	}
-	arena_destroy(scratch);
-	path->current = path_list;
-	path->head = path_list;
-}
-
 
 List	*pathfind_breadth_first(Arena *arena, Arena *scratch, Arr2D grid, Vector2 grid_size, Vector2 starting_pos, Vector2 goal)
 {

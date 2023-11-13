@@ -71,14 +71,14 @@ void	game_loop(ecs_iter_t	*it)
 	bool	*player_action_wait = ecs_get_mut(it->world, ecs_lookup(it->world, "PlayerAction"), Bool);
 	if (*player_action_wait)
 		return ;
-	printf("it->count %d\n", it->count);
+	//printf("it->count %d\n", it->count);
 	for (int i = 0; i < it->count; i++)
 	{
 		energy[i].current += energy[i].increment;
 		if (energy[i].current >= ENERGY_THRESHOLD)
 		{
 			//printf("entity energy: %s, %d\n", ecs_get_name(it->world, it->entities[i]), energy[i].current);
-			printf("%d\n", energy[i].current);
+			//printf("%d\n", energy[i].current);
 			if (ecs_has_id(it->world, it->entities[i], Player))
 			{
 				*player_action_wait = true;

@@ -228,7 +228,7 @@ static void	on_update(ecs_iter_t *it)
 		for (int i = 0; i < iter.count; i++)
 		{
 			ecs_run(it->world, iter.entities[i], it->delta_time, NULL);
-			printf("%s\n", ecs_get_name(it->world, iter.entities[i]));
+			//printf("%s\n", ecs_get_name(it->world, iter.entities[i]));
 		}
 	}
 }

@@ -25,3 +25,15 @@ int	Vector2Compare(Vector2 vec1, Vector2 vec2) // NOTE rename?
 {
 	return (vec1.x == vec2.x &&  vec1.y == vec2.y);
 }
+
+void	print_arr2d(Arr2D arr)
+{
+	for (int y = 0; y < arr.size.y; y++)
+	{
+		for (int x = 0; x < arr.size.x; x++)
+		{
+			printf("%d ", arr.arr[y][x]);
+		}
+		printf("\n");
+	}
+}
