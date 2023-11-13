@@ -21,10 +21,11 @@ void	lstadd_back(List **list, List *new)
 {
 	List	*i;
 
-	if (!*list)
+	if (*list == NULL)
 		*list = new;
 	else
 	{
+		assert(*list);
 		i = lstlast(*list);
 		i->next = new;
 	}

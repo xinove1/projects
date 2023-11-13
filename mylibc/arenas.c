@@ -64,6 +64,7 @@ void	*pool_alloc(Arena *arena)
 	void	*mem = NULL;
 
 	mem = arena->freed;
+	assert(mem != NULL);
 	arena->freed = arena->freed->next;
 	return (mem);
 }
