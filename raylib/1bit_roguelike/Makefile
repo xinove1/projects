@@ -67,11 +67,13 @@ all: $(NAME)
 clean:
 	@make -C $(FLECS) clean
 	@make -C $(MY_LIB) clean
+	@make -C $(RAYLIB) clean
 	@$(RM) $(OBJ)
 
 fclean: clean
 	@make -C $(FLECS) fclean
 	@make -C $(MY_LIB) fclean
+	@make -C $(RAYLIB) clean
 	@$(RM) $(NAME)
 
 re: fclean all

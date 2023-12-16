@@ -42,6 +42,7 @@ void	init_ecs();
 void	render_path(ecs_iter_t *it);
 void	render_colliders_map(ecs_iter_t	*it);
 void	fill_map(ecs_world_t *world, ecs_query_t	*colliders, ecs_entity_t	game_map);
+void	place_game_border(ecs_world_t *world);
 
 // Update
 void	input_player(ecs_iter_t *it);

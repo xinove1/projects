@@ -37,3 +37,36 @@ void	fill_map(ecs_world_t *world, ecs_query_t	*colliders, ecs_entity_t	game_map)
 		}
 	}
 }
+
+void	place_game_border(ecs_world_t *world)
+{
+	const int	TILE = 49;
+	for (int i = 0; i <= data.map_bounds.y; i++)
+	{
+		ecs_entity_t	wall = ecs_new_id(world);
+		ecs_set(world, wall, Position, {-1, i});
+		ecs_set(world, wall, Tile, {TILE});
+		ecs_add(world, wall, Collider);
+	}
+	for (int i = 0; i <= data.map_bounds.y; i++)
+	{
+		ecs_entity_t	wall = ecs_new_id(world);
+		ecs_set(world, wall, Position, {data.map_bounds.x, i});
+		ecs_set(world, wall, Tile, {TILE});
+		ecs_add(world, wall, Collider);
+	}
+	for (int i = 0; i <= data.map_bounds.x; i++)
+	{
+		ecs_entity_t	wall = ecs_new_id(world);
+		ecs_set(world, wall, Position, {i, -1});
+		ecs_set(world, wall, Tile, {TILE});
+		ecs_add(world, wall, Collider);
+	}
+	for (int i = 0; i <= data.map_bounds.x; i++)
+	{
+		ecs_entity_t	wall = ecs_new_id(world);
+		ecs_set(world, wall, Position, {i, data.map_bounds.y });
+		ecs_set(world, wall, Tile, {TILE});
+		ecs_add(world, wall, Collider);
+	}
+}

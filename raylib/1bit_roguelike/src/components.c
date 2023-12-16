@@ -167,34 +167,6 @@ void	init_ecs()
 
 
 	//Test entitys
-	for (int i = 0; i <= data.map_bounds.y; i++)
-	{
-		ecs_entity_t	wall = ecs_new_id(ecs);
-		ecs_set(ecs, wall, Position, {-1, i});
-		ecs_set(ecs, wall, Tile, {49});
-		ecs_add(ecs, wall, Collider);
-	}
-	for (int i = 0; i <= data.map_bounds.y; i++)
-	{
-		ecs_entity_t	wall = ecs_new_id(ecs);
-		ecs_set(ecs, wall, Position, {data.map_bounds.x, i});
-		ecs_set(ecs, wall, Tile, {49});
-		ecs_add(ecs, wall, Collider);
-	}
-	for (int i = 0; i <= data.map_bounds.x; i++)
-	{
-		ecs_entity_t	wall = ecs_new_id(ecs);
-		ecs_set(ecs, wall, Position, {i, -1});
-		ecs_set(ecs, wall, Tile, {49});
-		ecs_add(ecs, wall, Collider);
-	}
-	for (int i = 0; i <= data.map_bounds.x; i++)
-	{
-		ecs_entity_t	wall = ecs_new_id(ecs);
-		ecs_set(ecs, wall, Position, {i, data.map_bounds.y });
-		ecs_set(ecs, wall, Tile, {49});
-		ecs_add(ecs, wall, Collider);
-	}
 	ecs_entity_t	p = ecs_entity(ecs, { .name = "Player" });
 	ecs_entity_t	e = ecs_new_id(ecs);
 	ecs_set(ecs, p, Position, {25, 10});
@@ -214,6 +186,7 @@ void	init_ecs()
 	ecs_add_pair(ecs, e, TargetFollow, p);
 	ecs_add(ecs, e, Collider);
 
+	place_game_border(ecs);
 	fill_map(ecs, colliders, map);
 }
 
