@@ -16,7 +16,7 @@ DEBUG_FLAGS= -fsanitize=address -g
 RFLAGS= -lGL -lm -lpthread -ldl -lrt -lX11
 RFLAGS_WINDOWS= -lopengl32 -lgdi32 -lwinmm
 
-WEBFLAGS = --preload-file assets -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=cwrap -s ASYNCIFY -Os -s USE_GLFW=3 -DPLATFORM_WEB
+WEBFLAGS = --preload-file assets -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=cwrap -s STACK_SIZE=1mb  -Os -s ASYNCIFY -s USE_GLFW=3 -DPLATFORM_WEB -sGL_ENABLE_GET_PROC_ADDRESS
 
 RM= rm -f
 
@@ -45,7 +45,7 @@ windows: $(addprefix src/, $(SRC)) src/components.h src/game.h
 	$(CC_WINDOWS) $(OBJ) $(MY_LIB)/mylib.a $(FLECS)/flecs.a $(RAYLIB)/libraylib.a $(RFLAGS_WINDOWS) -o $(NAME).exe
 
 web: $(addprefix src/, $(SRC)) src/components.h src/game.h
-	make -C $(RAYLIB) PLATFORM=PLATFORM_WEB -B
+	make -C $(RAYLIB) PLATFORM=PLATFORM_WEB -B EMSDK_PATH=/home/xinove/stuff/emsdk  PYTHON_PATH=/usr/bin/python NODE_PATH=/home/xinove/stuff/emsdk/node/16.20.0_64bit/bin
 	make -C $(FLECS) web
 	make -C $(MY_LIB) web
 	emcc $(CFLAGS) -c $(addprefix src/, $(SRC))
