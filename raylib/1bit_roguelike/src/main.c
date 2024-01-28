@@ -32,7 +32,7 @@ int main(void)
 	return 0;
 }
 
-// NOTE ???
+// NOTE Web requirement if not compiling with async, remove?
 void	UpdateDrawFrame(void)
 {
 	ecs_progress(data.ecs, GetFrameTime());

@@ -37,7 +37,8 @@ typedef struct
 }EnergyLevel;
 
 
-typedef int Tile;
+typedef Vector2Int Tile;
+
 typedef struct
 {
 	float	duration;
@@ -75,6 +76,10 @@ extern ECS_TAG_DECLARE(TargetFollow);
 
 // Systems
 //extern ECS_SYSTEM_DECLARE(id);
+
+// Querys
+extern ecs_query_t	*COLLIDERS_QUERY;
+extern ecs_query_t	*COLLIDERS_HEALTH_QUERY;
 
 // Ids
 extern ECS_DECLARE(PreUpdate);

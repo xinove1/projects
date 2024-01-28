@@ -30,10 +30,14 @@ ECS_DECLARE(PostDraw2D);
 ECS_DECLARE(OnDraw);
 ECS_DECLARE(PostDraw);
 
-static void	 setup_phases(ecs_world_t *ecs);
-static void	 setup_tags(ecs_world_t *ecs);
-static void	 setup_components(ecs_world_t *ecs);
+ecs_query_t	*COLLIDERS_QUERY;
+ecs_query_t	*COLLIDERS_HEALTH_QUERY;
+
+static void	setup_phases(ecs_world_t *ecs);
+static void	setup_tags(ecs_world_t *ecs);
+static void	setup_components(ecs_world_t *ecs);
 static void	on_update(ecs_iter_t *it);
+static void	test_entitys(ecs_world_t *ecs);
 static int flecs_entity_compare(ecs_entity_t e1, const void *ptr1, ecs_entity_t e2, const void *ptr2);
 
 void	init_ecs()
@@ -50,14 +54,14 @@ void	init_ecs()
 	ECS_SYSTEM(ecs, end_draw2D, PostDraw2D, 0);
 	ECS_SYSTEM(ecs, end_draw, PostDraw, 0);
 
-	ecs_query_t *colliders = ecs_query_init(ecs, &(ecs_query_desc_t){
+	COLLIDERS_QUERY = ecs_query_init(ecs, &(ecs_query_desc_t){
 		.filter.terms = {
 			{ ecs_id(Position) },
 			{ ecs_id(Collider) }
 		}
 	});
 
-	ecs_query_t *colliders_health = ecs_query_init(ecs, &(ecs_query_desc_t){
+	COLLIDERS_HEALTH_QUERY = ecs_query_init(ecs, &(ecs_query_desc_t){
 		.filter.terms = {
 			{ ecs_id(Position) },
 			{ ecs_id(Collider) }, // Maybe dont care about collider,
@@ -91,7 +95,7 @@ void	init_ecs()
 		/* 	{ecs_id(Attack)} */
 		/* }, */
 		.callback = test_raycast,
-		.ctx = colliders
+		.ctx = COLLIDERS_QUERY
 	});
 
 	// Update Systems
@@ -118,7 +122,7 @@ void	init_ecs()
 			{ecs_id(Attack)}
 		},
 		.callback = attack,
-		.ctx = colliders_health
+		.ctx = COLLIDERS_HEALTH_QUERY
 	});
 
 	ecs_entity_t move_sys = ecs_system(ecs, {
@@ -131,7 +135,7 @@ void	init_ecs()
 			{ecs_id(Dir)},
 		},
 		.callback = move,
-		.ctx = colliders
+		.ctx = COLLIDERS_QUERY
 	});
 
 
@@ -139,7 +143,7 @@ void	init_ecs()
 		.filter.terms = { { ecs_id(Collider)}},
 		.events = EcsOnAdd,
 		.callback = on_new_collider,
-		.ctx = colliders
+		.ctx = COLLIDERS_QUERY
 	});
 
 	// ECS_SYSTEM(ecs, pathfind, OnUpdate, Position, Target, Path);
@@ -163,23 +167,29 @@ void	init_ecs()
 	ecs_set(ecs, player_action, Bool, {false});
 	ecs_entity_t	map = ecs_entity(ecs, { .name = "GameMap" });
 	ecs_set(ecs, map, Arr2D, {NULL});
-	//  ecs_lookup(world, "GameMap");
 
-
-	//Test entitys
 	ecs_entity_t	p = ecs_entity(ecs, { .name = "Player" });
-	ecs_entity_t	e = ecs_new_id(ecs);
 	ecs_set(ecs, p, Position, {25, 10});
 	ecs_set(ecs, p, EnergyLevel, {0, 10});
-	ecs_set(ecs, p, Tile, {21});
+	ecs_set(ecs, p, Tile, {21, 0});
 	ecs_set(ecs, p, Dir, {0});
 	ecs_set(ecs, p, Health, {3});
 	ecs_add(ecs, p, Player);
 	ecs_add(ecs, p, Collider);
+	printf("json: \n %s\n", ecs_entity_to_json(ecs, p, NULL));
+	//load_level(ecs);
+	//load_grid(ecs);
+	test_entitys(ecs);
+}
+
+static void	test_entitys(ecs_world_t *ecs)
+{
+	ecs_entity_t	p = ecs_lookup(ecs, "Player");
+	ecs_entity_t	e = ecs_new_id(ecs);
 
 	ecs_set(ecs, e, Position, {22, 10});
 	ecs_set(ecs, e, EnergyLevel, {0, 10});
-	ecs_set(ecs, e, Tile, {41});
+	ecs_set(ecs, e, Tile, {41, 0});
 	ecs_set(ecs, e, Health, {3});
 	ecs_set(ecs, e, Dir, {0, 0});
 	ecs_set(ecs, e, Path, {NULL, NULL, NULL});
@@ -187,7 +197,8 @@ void	init_ecs()
 	ecs_add(ecs, e, Collider);
 
 	place_game_border(ecs);
-	fill_map(ecs, colliders, map);
+	ecs_entity_t	game_map = ecs_lookup(ecs, "GameMap");
+	fill_map(ecs, COLLIDERS_QUERY, game_map);
 }
 
 static void	on_update(ecs_iter_t *it)

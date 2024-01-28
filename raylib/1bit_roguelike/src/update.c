@@ -14,7 +14,7 @@ void	test_raycast(ecs_iter_t	*it)
 		ecs_entity_t	tile = ecs_new_id(it->world);
 		Position pos = Vector2ToPos(mouse_pos_tiled);
 		ecs_set(it->world, tile, Position, {pos.x, pos.y});
-		ecs_set(it->world, tile, Tile, {49});
+		ecs_set(it->world, tile, Tile, {19, 1});
 		ecs_add(it->world, tile, Collider);
 	}
 	if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON))

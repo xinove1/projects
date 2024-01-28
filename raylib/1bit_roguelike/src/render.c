@@ -17,8 +17,8 @@ void	render_tiles(ecs_iter_t *it)
 
 	for (int i = 0; i < it->count; i++)
 	{
-		rec.x = (tile[i] % (int) TILEMAP_SZ.x) * TILE_SZ;
-		rec.y = (tile[i] / TILEMAP_SZ.y) * TILE_SZ;
+		rec.x = tile[i].x * TILE_SZ;
+		rec.y = tile[i].y * TILE_SZ;
 		DrawTextureRec(data.tilemap, rec, (Vector2) {pos[i].x * TILE_SZ, pos[i].y * TILE_SZ}, WHITE);
 	}
 }
@@ -50,8 +50,8 @@ void	flash_color(ecs_iter_t *it)
 		colors[i].timer += it->delta_time;
 		if (colors[i].timer >= colors[i].duration)
 			ecs_remove(it->world, it->entities[i], FlashColor);
-		rec.x = (tile[i] % (int) TILEMAP_SZ.x) * TILE_SZ;
-		rec.y = (tile[i] / TILEMAP_SZ.y) * TILE_SZ;
+		rec.x = tile[i].x * TILE_SZ;
+		rec.y = tile[i].y * TILE_SZ;
 		float	color_alpha = Remap(colors[i].timer, 0, colors[i].duration, 0, 1);
 		DrawRectangle(pos[i].x * TILE_SZ, pos[i].y * TILE_SZ, rec.width, rec.height, ColorAlpha(colors[i].color, color_alpha));
 	}

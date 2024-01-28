@@ -3,7 +3,7 @@
 void	on_new_collider(ecs_iter_t *it)
 {
 	ecs_entity_t	game_map = ecs_lookup(it->world, "GameMap");
-	fill_map(it->world, it->ctx, game_map);
+	fill_map(it->world, COLLIDERS_QUERY, game_map);
 }
 
 void	fill_map(ecs_world_t *world, ecs_query_t	*colliders, ecs_entity_t	game_map)
