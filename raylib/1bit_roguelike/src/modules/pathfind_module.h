@@ -1,4 +1,85 @@
-#include "game.h"
+#ifndef PATHFIND_MODULE_H_
+# define PATHFIND_MODULE_H_
+# include "../includes.h"
+# include "basic_components_module.h"
+
+typedef struct
+{
+	Arena	*mem;
+	List	*head;
+	List	*current;
+} Path;
+
+extern ECS_COMPONENT_DECLARE(Path);
+
+void	pathfind_a_star(Path *path, Vector2 start, Vector2 target, Arr2D map);
+void	PathfindImport(ecs_world_t *ecs);
+void	_render_paths(ecs_iter_t *it);
+Vector2	*next_path_pos(Path *path);
+Vector2	next_path_dir(Path *path);
+
+#endif
+
+#ifdef PATHFIND_MODULE_IMPLEMENTATION
+
+ECS_COMPONENT_DECLARE(Path);
+
+static Arena	*_nodes_arena = NULL;
+
+static void _pathfind_atfini(ecs_world_t *ecs, void *ctx)
+{
+	if (_nodes_arena)
+		arena_destroy(_nodes_arena);
+}
+
+void	PathfindImport(ecs_world_t *ecs)
+{
+	ECS_MODULE(ecs, Pathfind);
+	ECS_COMPONENT_DEFINE(ecs, Path);
+	ECS_SYSTEM(ecs, _render_paths, OnDraw2D, Path); // TODO make optional & debug only
+	ecs_atfini(ecs, _pathfind_atfini, NULL);
+}
+
+// Returns Dir
+Vector2	next_path_dir(Path *path)
+{
+	if (path->current == NULL || path->current->next == NULL)
+		return ((Vector2){0, 0});
+	Vector2	current = *(Vector2 *)path->current->content;
+	path->current = path->current->next;
+	Vector2	next = *(Vector2 *)path->current->content;
+	return (Vector2Subtract(next, current));
+}
+
+Vector2	*next_path_pos(Path *path)
+{
+	if (path->current == NULL)
+		return (NULL);
+	Vector2	*pos = path->current->content;
+	path->current = path->current->next;
+	return (pos);
+}
+
+void	_render_paths(ecs_iter_t *it)
+{
+	Path	*path = ecs_field(it, Path, 1);
+
+	// TODO change color for each path
+	for (int i = 0; i < it->count; i++)
+	{
+		if (!path[i].current)
+			continue;
+		List	*lst = path[i].current;
+		while (lst)
+		{
+			Vector2		*v = lst->content;
+			Position	d_pos = (Position) {v->x * TILE_SZ, v->y * TILE_SZ};
+			DrawRectangle(d_pos.x, d_pos.y, TILE_SZ, TILE_SZ, ColorAlpha(BLUE, 0.3));
+			lst = lst->next;
+		}
+	}
+}
+
 
 typedef struct Node
 {
@@ -20,8 +101,16 @@ static int	next_neighbor(Node **neighbor, Node *node, List **nodes, Arena *arena
 
 void	pathfind_a_star(Path *path, Vector2 start, Vector2 target, Arr2D map)
 {
-	Arena	*arena_nodes = arena_create_sized(sizeof(Node), 200);
-	Node	*target_node = a_star(start, target, map, arena_nodes);
+	printf("start: %f,%f | target: %f, %f\n", start.x, start.y, target.x, target.y);
+	if (_nodes_arena == NULL)
+		_nodes_arena = arena_create_sized(sizeof(Node), map.size.x * map.size.y); // NOTE hard coded number
+	else
+		arena_clean(_nodes_arena);
+	if (path->mem == NULL)
+		path->mem = arena_create_sized(sizeof(List) + sizeof(Vector2), 10);
+	else
+		arena_clean(path->mem);
+	Node	*target_node = a_star(start, target, map, _nodes_arena);
 
 	List	*path_lst = NULL;
 	Node	*current = target_node;
@@ -33,12 +122,11 @@ void	pathfind_a_star(Path *path, Vector2 start, Vector2 target, Arr2D map)
 		*pos = current->pos;
 		new->content = pos;
 		new->next = NULL;
-		lstadd_back(&path_lst, new);
+		lstadd_front(&path_lst, new);
 		current = current->prev;
 	}
 	path->head = path_lst;
 	path->current = path_lst;
-	arena_destroy(arena_nodes);
 }
 
 // NOTE check if start/target is inside map
@@ -65,8 +153,13 @@ Node	*a_star(Vector2 start, Vector2 target, Arr2D map, Arena *arena_nodes)
 		{
 			if (get_array(map.arr, neighbor->pos) == COLLISION)
 			{
-				if (Vector2Compare(neighbor->pos, target))
+				if (Vector2Compare(neighbor->pos, target)) // NOTE i dont remember why this check exists and the goto out
+				{
+					arena_destroy(arena_lst);
+					return (neighbor);
+					printf("aosnetuhaoestnuheoasntuh\n");
 					goto out;
+				}
 				continue ;
 			}
 			int	new_cost = current_node->cost + get_array(map.arr, neighbor->pos) + 1; // NOTE map current has 0 for normal tiles but value of traversal needs to be at least one, so +1
@@ -81,7 +174,8 @@ Node	*a_star(Vector2 start, Vector2 target, Arr2D map, Arena *arena_nodes)
 		pool_free(arena_lst, current);
 	}
 	out:
-	printf("a_star target not found\n");
+	printf("a_star target not found, target: %f,%f\n", target.x, target.y);
+	printf("map[target]: %d\n", get_array(map.arr, target));
 	arena_destroy(arena_lst);
 	return (NULL);
 }
@@ -210,3 +304,5 @@ static int	lstremove(List **list, List *remove)
 	}
 	return (1);
 }
+
+#endif

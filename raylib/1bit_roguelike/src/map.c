@@ -1,8 +1,9 @@
 #include "game.h"
 
-void	on_new_collider(ecs_iter_t *it)
+void	update_colliders_map(ecs_iter_t *it)
 {
 	ecs_entity_t	game_map = ecs_lookup(it->world, "GameMap");
+
 	fill_map(it->world, COLLIDERS_QUERY, game_map);
 }
 
@@ -40,7 +41,7 @@ void	fill_map(ecs_world_t *world, ecs_query_t	*colliders, ecs_entity_t	game_map)
 
 void	place_game_border(ecs_world_t *world)
 {
-	const int	TILE = 49;
+	const int	TILE = 50;
 	for (int i = 0; i <= data.map_bounds.y; i++)
 	{
 		ecs_entity_t	wall = ecs_new_id(world);

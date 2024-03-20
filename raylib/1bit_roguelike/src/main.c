@@ -1,5 +1,10 @@
 #define RAYGUI_IMPLEMENTATION
+#define RAYCAST_MODULE_IMPLEMENTATION
 #include "game.h"
+#define BASIC_COMPONENTS_MODULE_IMPLEMENTATION
+#define PATHFIND_MODULE_IMPLEMENTATION
+#include "modules/basic_components_module.h"
+#include "modules/pathfind_module.h"
 
 static void	init_config();
 void	UpdateDrawFrame(void);

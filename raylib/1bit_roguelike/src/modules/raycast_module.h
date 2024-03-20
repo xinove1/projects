@@ -1,10 +1,28 @@
-#include "game.h"
+#ifndef RAYCAST_MODULE_H_
+# define RAYCAST_MODULE_H_
+# include "../includes.h"
+# include "basic_components_module.h"
 
-// TODO clean from debug stuff
+Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, Arr2D map);
+ecs_entity_t	*raycast_entity(Vector2 origin, Vector2 dir, int lenght, ecs_world_t *ecs);
+void	set_raycast_entity_check_func(ecs_entity_t *(*check_collision)(Position, ecs_world_t*));
+int		Vector2Compare(Vector2 vec1, Vector2 vec2);// NOTE rename?
+int		get_array(int	**array, Vector2 pos);
+void	set_array(int	**array, Vector2 pos, int new_value);
+
+#endif // RAYCAST_MODULE_H_
+#ifdef RAYCAST_MODULE_IMPLEMENTATION
+
+static ecs_entity_t *(*_check_collision)(Position, ecs_world_t*) = NULL;
+
+void	set_raycast_entity_check_func(ecs_entity_t *(*check_collision)(Position, ecs_world_t*))
+{
+	_check_collision = check_collision;
+}
+
 Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, Arr2D map)
 {
 	Vector2	step_size = {sqrt(1 + (dir.y / dir.x) * (dir.y / dir.x)), sqrt(1 + (dir.x / dir.y) * (dir.x / dir.y))};
-	/* Vector2	step_size = {sqrt(1 + (dir.y * dir.y) / (dir.x / dir.x)), sqrt(1 + (dir.x * dir.x) / (dir.y * dir.y))}; */
 	Vector2	current = {(int) origin.x, (int) origin.y}; // Chunking to specific tile if origin is pos inside a tile
 	Vector2	raylenght;
 	Vector2	step_dir;
@@ -29,13 +47,6 @@ Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, Arr2D map)
 		step_dir.y = 1;
 		raylenght.y = ((current.y + 1) - origin.y) * step_size.y;
 	}
-	/* printf("-----------------------\n"); */
-	/* printf("origin: %f,%f\n", origin.x, origin.y); */
-	/* printf("dir: %f,%f\n", dir.x, dir.y); */
-	/* printf("step_size: %f,%f\n", step_size.x, step_size.y); */
-	/* printf("current: %f,%f\n", current.x, current.y); */
-	/* printf("raylenght: %f,%f\n", raylenght.x, raylenght.y); */
-	/* printf("step_dir: %f,%f\n", step_dir.x, step_dir.y); */
 	float	distance = 0;
 	while (distance < lenght)
 	{
@@ -54,25 +65,16 @@ Vector2	raycast(Vector2 origin, Vector2 dir, int lenght, Arr2D map)
 		Position	icurrent = Vector2ToPos(current);
 		if (icurrent.x < 0 || icurrent.x >= map.size.x || icurrent.y < 0 || icurrent.y >= map.size.y)
 			break ;
-		//printf("icurrent: %d,%d\n", icurrent.x, icurrent.y);
-		{
-			/* ecs_entity_t	t = ecs_new_id(data.ecs); */
-			/* ecs_set(data.ecs, t, Position, {icurrent.x, icurrent.y }); */
-			/* ecs_set(data.ecs, t, Tile, {50}); */
-			/* ecs_set(data.ecs, t, TimerDeath, {4}); */
-		}
 		if (map.arr[icurrent.y][icurrent.x] == 1)
 		{
 			Vector2 r = Vector2Add(origin, Vector2Scale(dir, distance));
-			/* printf("distance %f\n", distance); */
-			/* printf("r: %f,%f\n", r.x, r.y); */
 			return (r);
 		}
 	}
 	return (Vector2Zero());
 }
 
-ecs_entity_t	*raycast_entity(Vector2 origin, Vector2 dir, int lenght, ecs_query_t *entitys, ecs_world_t *world)
+ecs_entity_t	*raycast_entity(Vector2 origin, Vector2 dir, int lenght, ecs_world_t *ecs)
 {
 	Vector2	step_size = {sqrt(1 + (dir.y / dir.x) * (dir.y / dir.x)), sqrt(1 + (dir.x / dir.y) * (dir.x / dir.y))};
 	Vector2	current = {(int) origin.x, (int) origin.y};
@@ -116,11 +118,14 @@ ecs_entity_t	*raycast_entity(Vector2 origin, Vector2 dir, int lenght, ecs_query_
 			raylenght.y += step_size.y;
 		}
 		Position	icurrent = Vector2ToPos(current);
-		if (icurrent.x < 0 || icurrent.x >= data.map_bounds.x || icurrent.y < 0 || icurrent.y >= data.map_bounds.y)
-			break ;
-		ecs_entity_t	*entity = check_collision(icurrent, entitys, world);
+		/* if (icurrent.x < 0 || icurrent.x >= map.size.x || icurrent.y < 0 || icurrent.y >= map.size.y) */
+		/* 	break ; */
+		assert(_check_collision != NULL);
+		ecs_entity_t	*entity = (*_check_collision)(icurrent, ecs);
 		if (entity)
 			return (entity);
 	}
 	return (NULL);
 }
+
+#endif // RAYCAST_MODULE_IMPLEMENTATION

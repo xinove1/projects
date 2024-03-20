@@ -1,0 +1,222 @@
+{
+	"identifier": "Level_0",
+	"uniqueIdentifer": "7a355070-8990-11ee-9c6a-d70fc6423775",
+	"x": 0,
+	"y": 0,
+	"width": 304,
+	"height": 272,
+	"bgColor": "#472D3C",
+	"neighbourLevels": [],
+	"customFields" : {},
+	"layers": [
+		"Tiles.png"
+	],
+	"entities": {
+		"Enemy_test": [
+			{
+				"id": "Enemy_test",
+				"iid": "fcc241c0-8990-11ee-9c6a-5371de5256ab",
+				"layer": "Entities",
+				"x": 96,
+				"y": 192,
+				"width": 16,
+				"height": 16,
+				"color": 12470831,
+				"customFields": {
+					"Collision": "True",
+					"Path_find": "To_player",
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 496,
+						"y": 112,
+						"w": 16,
+						"h": 16
+					}
+				}
+			},
+			{
+				"id": "Enemy_test",
+				"iid": "91f72590-8990-11ee-906c-f982c31872ec",
+				"layer": "Entities",
+				"x": 240,
+				"y": 160,
+				"width": 16,
+				"height": 16,
+				"color": 12470831,
+				"customFields": {
+					"Collision": "True",
+					"Path_find": "To_player",
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 480,
+						"y": 128,
+						"w": 16,
+						"h": 16
+					}
+				}
+			}
+		],
+		"Collider": [
+			{
+				"id": "Collider",
+				"iid": "f94560f0-8990-11ee-bad9-13aa428bdf9a",
+				"layer": "Entities",
+				"x": 112,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 48,
+						"y": 288,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "fa129c00-8990-11ee-bad9-31dcc65a3bed",
+				"layer": "Entities",
+				"x": 96,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 48,
+						"y": 288,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "fa6cc9f0-8990-11ee-bad9-fbb50e253cb1",
+				"layer": "Entities",
+				"x": 80,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 48,
+						"y": 288,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "fa9b5400-8990-11ee-bad9-d3b1cfdf9d13",
+				"layer": "Entities",
+				"x": 64,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 48,
+						"y": 288,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "fcbf1e60-8990-11ee-bad9-0779d2a45edf",
+				"layer": "Entities",
+				"x": 128,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 0,
+						"y": 256,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "fdd08e60-8990-11ee-bad9-9d9ba7422b4b",
+				"layer": "Entities",
+				"x": 144,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 32,
+						"y": 256,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "00ceda40-8990-11ee-bad9-ebfc34610352",
+				"layer": "Entities",
+				"x": 144,
+				"y": 96,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 32,
+						"y": 288,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			},
+			{
+				"id": "Collider",
+				"iid": "0107eba0-8990-11ee-bad9-4395f9f19f3f",
+				"layer": "Entities",
+				"x": 128,
+				"y": 96,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Tile": {
+						"tilesetUid": 2,
+						"x": 0,
+						"y": 288,
+						"w": 16,
+						"h": 16
+					},
+					"Collision": "True"
+				}
+			}
+		]
+	}
+}

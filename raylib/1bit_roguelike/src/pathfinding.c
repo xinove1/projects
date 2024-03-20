@@ -21,6 +21,8 @@ void	pathfind(ecs_iter_t *it)
 			path[i].mem = arena_create_sized(sizeof(List) + sizeof(Vector2), 10);
 		arena_clean(path[i].mem);
 		pathfind_a_star(&path[i], PosToVector2(pos[i]), PosToVector2(*target_pos), *map);
+		Vector2 current = *(Vector2 *)path[i].current->content;
+		printf("path.current %f,%f\n", current.x, current.y);
 	}
 }
 

@@ -5,6 +5,7 @@ LIBFT = ./libft
 CC= gcc
 
 CFLAGS= -Wall -Wextra -Werror
+RFLAGS= -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 RM= rm -f
 
@@ -19,7 +20,7 @@ OBJ=$(SRC:.c=.o)
 $(NAME): $(SRC) so_long.h
 	@make -C $(LIBFT)
 	$(CC) $(CFLAGS) -c $(SRC)
-	$(CC) $(CFLAGS) $(OBJ) $(LIBFT)/libft.a -lmlx -lXext -lX11  -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) $(LIBFT)/libft.a $(RFLAGS)  -o $(NAME)
 
 all: $(NAME)
 

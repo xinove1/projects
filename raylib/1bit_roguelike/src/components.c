@@ -1,39 +1,23 @@
 #include "game.h"
 
-ECS_COMPONENT_DECLARE(Position);
 ECS_COMPONENT_DECLARE(Tile);
 ECS_COMPONENT_DECLARE(Health);
-ECS_COMPONENT_DECLARE(Dir);
 ECS_COMPONENT_DECLARE(FlashColor);
 ECS_COMPONENT_DECLARE(Attack);
-ECS_COMPONENT_DECLARE(Arr2D);
-ECS_COMPONENT_DECLARE(Path);
 ECS_COMPONENT_DECLARE(TimerDeath);
 ECS_COMPONENT_DECLARE(EnergyLevel);
-ECS_COMPONENT_DECLARE(Bool);
+ECS_COMPONENT_DECLARE(EnemyState);
+ECS_COMPONENT_DECLARE(LineOfSight);
 
 ECS_TAG_DECLARE(Despawn);
 ECS_TAG_DECLARE(Player);
 ECS_TAG_DECLARE(Enemy);
 ECS_TAG_DECLARE(Collider);
-ECS_TAG_DECLARE(Despawn);
 ECS_TAG_DECLARE(TargetFollow);
-
-ECS_DECLARE(PreUpdate);
-ECS_DECLARE(OnUpdate);
-ECS_DECLARE(OnUpdateReal);
-ECS_DECLARE(PostUpdate);
-ECS_DECLARE(PreDraw);
-ECS_DECLARE(PreDraw2D);
-ECS_DECLARE(OnDraw2D);
-ECS_DECLARE(PostDraw2D);
-ECS_DECLARE(OnDraw);
-ECS_DECLARE(PostDraw);
 
 ecs_query_t	*COLLIDERS_QUERY;
 ecs_query_t	*COLLIDERS_HEALTH_QUERY;
 
-static void	setup_phases(ecs_world_t *ecs);
 static void	setup_tags(ecs_world_t *ecs);
 static void	setup_components(ecs_world_t *ecs);
 static void	on_update(ecs_iter_t *it);
@@ -45,14 +29,14 @@ void	init_ecs()
 	data.ecs = ecs_init();
 	ecs_world_t	*ecs = data.ecs;
 
-	setup_phases(ecs);
+	ECS_IMPORT(ecs, RaylibPipeline);
+	ECS_IMPORT(ecs, BasicComponents);
+	ECS_IMPORT(ecs, Pathfind);
+	set_camera(&data.camera);
+	set_raycast_entity_check_func(&check_collision);
+
 	setup_tags(ecs);
 	setup_components(ecs);
-
-	ECS_SYSTEM(ecs, prepare_draw, PreDraw, 0);
-	ECS_SYSTEM(ecs, prepare_draw2D, PreDraw2D, 0);
-	ECS_SYSTEM(ecs, end_draw2D, PostDraw2D, 0);
-	ECS_SYSTEM(ecs, end_draw, PostDraw, 0);
 
 	COLLIDERS_QUERY = ecs_query_init(ecs, &(ecs_query_desc_t){
 		.filter.terms = {
@@ -77,10 +61,16 @@ void	init_ecs()
 		.order_by = flecs_entity_compare
 	});
 
+	ecs_query_t *energy_level_query = ecs_query_init(ecs, &(ecs_query_desc_t){
+		.filter.terms = {
+			{ ecs_id(EnergyLevel) },
+		}
+	});
+
 	// Draw Systems
 	ECS_SYSTEM(ecs, render_tiles, OnDraw2D, Position, Tile);
+	ECS_SYSTEM(ecs, render_sight, OnDraw2D, Position, LineOfSight);
 	ECS_SYSTEM(ecs, render_colliders_map, OnDraw2D, 0);
-	ECS_SYSTEM(ecs, render_path, OnDraw2D, Path);
 	ECS_SYSTEM(ecs, render_health, OnDraw2D, Position, Health);
 	ECS_SYSTEM(ecs, flash_color, OnDraw2D, Position, Tile, FlashColor);
 	ECS_SYSTEM(ecs, render_ui, OnDraw, 0);
@@ -95,11 +85,23 @@ void	init_ecs()
 		/* 	{ecs_id(Attack)} */
 		/* }, */
 		.callback = test_raycast,
-		.ctx = COLLIDERS_QUERY
+	});
+
+	ecs_entity_t _game_loop = ecs_system(ecs, {
+		.entity = ecs_entity(ecs,{
+			.name =  "GameLoop",
+			.add  = {ecs_dependson(PreUpdate)}
+		}),
+		/* .query.filter.terms = { */
+		/* 	{ecs_id(EnergyLevel)} */
+		/* }, */
+		.callback = game_loop,
+		.ctx = energy_level_query,
+		.no_readonly = true
 	});
 
 	// Update Systems
-	ECS_SYSTEM(ecs, game_loop, PreUpdate, EnergyLevel);
+	//ECS_SYSTEM(ecs, pathfind, OnUpdate, Position, Path);
 	ECS_SYSTEM(ecs, input_player, PreUpdate, 0);
 	ECS_SYSTEM(ecs, camera_follow_player, PostUpdate, Position, Player);
 	ECS_SYSTEM(ecs, despawn, PostUpdate, Despawn);
@@ -113,55 +115,7 @@ void	init_ecs()
 		.ctx = on_update_systems
 	});
 
-	ecs_entity_t attack_sys = ecs_system(ecs, {
-		.entity = ecs_entity(ecs,{
-			.name =  "Attack",
-			.add  = {ecs_dependson(OnUpdate)}
-		}),
-		.query.filter.terms = {
-			{ecs_id(Attack)}
-		},
-		.callback = attack,
-		.ctx = COLLIDERS_HEALTH_QUERY
-	});
-
-	ecs_entity_t move_sys = ecs_system(ecs, {
-		.entity = ecs_entity(ecs,{
-			.name =  "Move",
-			.add  = {ecs_dependson(OnUpdate)}
-		}),
-		.query.filter.terms = {
-			{ecs_id(Position)},
-			{ecs_id(Dir)},
-		},
-		.callback = move,
-		.ctx = COLLIDERS_QUERY
-	});
-
-
-	ecs_observer(ecs, {
-		.filter.terms = { { ecs_id(Collider)}},
-		.events = EcsOnAdd,
-		.callback = on_new_collider,
-		.ctx = COLLIDERS_QUERY
-	});
-
-	// ECS_SYSTEM(ecs, pathfind, OnUpdate, Position, Target, Path);
-	ecs_entity_t path_find_to_target = ecs_system(ecs, {
-		.entity = ecs_entity(ecs,{
-			.name =  "Pathfind",
-			.add  = {ecs_dependson(OnUpdate)}
-		}),
-		.query.filter.terms = {
-			{ecs_id(Position)},
-			{ecs_id(Path)},
-			{ecs_pair(TargetFollow, EcsWildcard)}
-		},
-		.callback = pathfind
-	});
-
-	// TODO refatctor this
-	ECS_SYSTEM(ecs, tick_deathtimer, OnUpdate, TimerDeath);
+	ECS_SYSTEM(ecs, update_colliders_map, PostUpdate);
 
 	ecs_entity_t	player_action = ecs_entity(ecs, { .name =  "PlayerAction" });
 	ecs_set(ecs, player_action, Bool, {false});
@@ -190,6 +144,8 @@ static void	test_entitys(ecs_world_t *ecs)
 	ecs_set(ecs, e, Position, {22, 10});
 	ecs_set(ecs, e, EnergyLevel, {0, 10});
 	ecs_set(ecs, e, Tile, {41, 0});
+	ecs_set(ecs, e, EnemyState, {PATROL});
+	ecs_set(ecs, e, LineOfSight, {4});
 	ecs_set(ecs, e, Health, {3});
 	ecs_set(ecs, e, Dir, {0, 0});
 	ecs_set(ecs, e, Path, {NULL, NULL, NULL});
@@ -228,39 +184,14 @@ static void	 setup_tags(ecs_world_t *ecs)
 
 static void	 setup_components(ecs_world_t *ecs)
 {
-	ECS_COMPONENT_DEFINE(ecs, Position);
 	ECS_COMPONENT_DEFINE(ecs, Tile);
-	ECS_COMPONENT_DEFINE(ecs, Dir);
 	ECS_COMPONENT_DEFINE(ecs, Health);
 	ECS_COMPONENT_DEFINE(ecs, FlashColor);
 	ECS_COMPONENT_DEFINE(ecs, Attack);
-	ECS_COMPONENT_DEFINE(ecs, Arr2D);
-	ECS_COMPONENT_DEFINE(ecs, Path);
 	ECS_COMPONENT_DEFINE(ecs, TimerDeath);
 	ECS_COMPONENT_DEFINE(ecs, EnergyLevel);
-	ECS_COMPONENT_DEFINE(ecs, Bool);
-}
-
-static void	 setup_phases(ecs_world_t *ecs)
-{
-	PreUpdate = ecs_new_w_id(ecs, EcsPhase);
-	OnUpdate = ecs_new_id(ecs);
-	OnUpdateReal = ecs_new_w_id(ecs, EcsPhase);
-	PostUpdate = ecs_new_w_id(ecs, EcsPhase);
-	PreDraw = ecs_new_w_id(ecs, EcsPhase);
-	PreDraw2D = ecs_new_w_id(ecs, EcsPhase);
-	OnDraw2D = ecs_new_w_id(ecs, EcsPhase);
-	PostDraw2D = ecs_new_w_id(ecs, EcsPhase);
-	OnDraw = ecs_new_w_id(ecs, EcsPhase);
-	PostDraw = ecs_new_w_id(ecs, EcsPhase);
-	ecs_add_pair(ecs, OnUpdateReal, EcsDependsOn, PreUpdate);
-	ecs_add_pair(ecs, PostUpdate, EcsDependsOn, OnUpdateReal);
-	ecs_add_pair(ecs, PreDraw, EcsDependsOn, PostUpdate);
-	ecs_add_pair(ecs, PreDraw2D, EcsDependsOn, PreDraw);
-	ecs_add_pair(ecs, OnDraw2D, EcsDependsOn, PreDraw2D);
-	ecs_add_pair(ecs, PostDraw2D, EcsDependsOn, OnDraw2D);
-	ecs_add_pair(ecs, OnDraw, EcsDependsOn, OnDraw2D);
-	ecs_add_pair(ecs, PostDraw, EcsDependsOn, OnDraw);
+	ECS_COMPONENT_DEFINE(ecs, EnemyState);
+	ECS_COMPONENT_DEFINE(ecs, LineOfSight);
 }
 
 static int flecs_entity_compare(ecs_entity_t e1, const void *ptr1, ecs_entity_t e2, const void *ptr2)

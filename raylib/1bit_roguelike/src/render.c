@@ -7,6 +7,30 @@ void	render_ui(ecs_iter_t *it)
 		printf("oaeuhaoenuh\n");
 }
 
+void	render_sight(ecs_iter_t *it)
+{
+	Position	*pos = ecs_field(it, Position, 1);
+	LineOfSight	*sight = ecs_field(it, LineOfSight, 2);
+
+	for (int i = 0; i < it->count; i++)
+	{
+		Vector2	origin = PosToVector2(pos[i]);
+		origin = Vector2Add(origin, (Vector2){0.5, 0.5});
+		int		lenght = sight[i];
+		Vector2	dir = {0, 0};
+		for (int angle = 0; angle < 360; angle += 10)
+		{
+			dir = (Vector2) {cos(DEG2RAD * angle), sin(DEG2RAD * angle)};
+			Vector2 pos = Vector2Add(Vector2Scale(origin, TILE_SZ), Vector2Scale(dir, lenght * TILE_SZ));
+			ecs_entity_t *e = raycast_entity(origin, dir, lenght, it->world);
+			if (e && ecs_has_id(it->world, *e, ecs_id(Player)))
+				DrawLine(origin.x * TILE_SZ, origin.y * TILE_SZ, pos.x, pos.y, RED);
+			else
+				DrawLine(origin.x * TILE_SZ, origin.y * TILE_SZ, pos.x, pos.y, BLUE);
+		}
+	}
+}
+
 void	render_tiles(ecs_iter_t *it)
 {
 	Position	*pos = ecs_field(it, Position, 1);
@@ -21,6 +45,21 @@ void	render_tiles(ecs_iter_t *it)
 		rec.y = tile[i].y * TILE_SZ;
 		DrawTextureRec(data.tilemap, rec, (Vector2) {pos[i].x * TILE_SZ, pos[i].y * TILE_SZ}, WHITE);
 	}
+
+	/* Vector2 origin = {20,10}; */
+	/* int	lenght = 10; */
+	/* Vector2	dir = {0, 0}; */
+	/* int	angle = 0; */
+	/* for (angle = 0; angle < 360; angle += 9) */
+	/* { */
+	/* 	dir = (Vector2) {cos(DEG2RAD * angle), sin(DEG2RAD * angle)}; */
+	/* 	Vector2 pos = Vector2Add(Vector2Scale(origin, TILE_SZ), Vector2Scale(dir, lenght * TILE_SZ)); */
+	/* 	ecs_entity_t	*e = raycast_entity(origin, dir, lenght, it->world); */
+	/* 	if (e) */
+	/* 		DrawLine(origin.x * TILE_SZ, origin.y * TILE_SZ, pos.x, pos.y, RED); */
+	/* 	else */
+	/* 		DrawLine(origin.x * TILE_SZ, origin.y * TILE_SZ, pos.x, pos.y, BLUE); */
+	/* } */
 }
 
 
@@ -76,52 +115,4 @@ void	render_colliders_map(ecs_iter_t	*it)
 			DrawRectangle(d_pos.x, d_pos.y, TILE_SZ, TILE_SZ, ColorAlpha(RED, 0.3));
 		}
 	}
-}
-
-void	render_path(ecs_iter_t *it)
-{
-	Path	*path = ecs_field(it, Path, 1);
-
-	for (int i = 0; i < it->count; i++)
-	{
-		if (!path[i].current)
-			continue;
-		List	*lst = path[i].current;
-		while (lst)
-		{
-			Vector2		*v = lst->content;
-			Position	d_pos = (Position) {v->x * TILE_SZ, v->y * TILE_SZ};
-			DrawRectangle(d_pos.x, d_pos.y, TILE_SZ, TILE_SZ, ColorAlpha(BLUE, 0.3));
-			lst = lst->next;
-		}
-	}
-}
-
-void	prepare_draw(ecs_iter_t	*it)
-{
-	(void) it;
-	BeginDrawing();
-	ClearBackground(RAYWHITE);
-	DrawFPS(10, 10);
-}
-
-void	prepare_draw2D(ecs_iter_t *it)
-{
-	(void) it;
-
-	BeginMode2D(data.camera);
-}
-
-void	end_draw2D(ecs_iter_t *it)
-{
-	(void) it;
-
-	EndMode2D();
-}
-
-void	end_draw(ecs_iter_t *it)
-{
-	(void) it;
-
-	EndDrawing();
 }
