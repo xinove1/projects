@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <assert.h>
 
 typedef int8_t  i8;
 typedef int16_t i16;
@@ -13,6 +14,9 @@ typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
+
+typedef int32_t b32; // bool
+typedef enum {false = 0, true = 1} __bool;
 
 typedef struct {
     u8 r;
@@ -65,11 +69,11 @@ static d Resolution      = {38, 8};
 static d ColorIndex      = {46, 4}; 
 static d ImportantColors = {50, 4}; 
 
-// NOTE  programs does not garanties freeing everything 
-//
+static char *PrintColorCharacterSet = "  ";
+
 void print_color(u8 red, u8 green, u8 blue)
 {
-    printf("\033[48;2;%d;%d;%dm \033[0m", red, green, blue);
+    printf("\033[48;2;%d;%d;%dm%s\033[0m", red, green, blue, PrintColorCharacterSet);
 }
 
 BitmapRawData read_bitmap_data(char *data)
@@ -125,29 +129,55 @@ BitmapRawData read_bitmap_file(char *path)
 
 void print_bitmap(BitmapRawData bitmap)
 {
-    //char *offset = bitmap.data + bitmap.pixel_data_offset;
-    char *offset = bitmap.data + bitmap.file_size;
-    u8 padding = bitmap.image_width % 4;
-    offset -= 3 + padding;
+    char *offset  = bitmap.data + bitmap.file_size; // go to end of data
+    u8 padding    = bitmap.image_width % 4;
+    u8 pixel_byte = bitmap.bit_count / 8;
+    offset -= pixel_byte + padding; // go to first pixel data backwards
     for (int y = bitmap.image_height; y > 0; y--) {
         for (int x = bitmap.image_width; x > 0; x--) {
             print_color(offset[2], offset[1], offset[0]); 
-            offset -= bitmap.bit_count / 8;
+            offset -= pixel_byte;
         }
         printf("\n");
         offset -= padding;
     }
 }
 
+#define flag_compare(flag, ...) strcmp_many(flag, ((const char*[]){__VA_ARGS__}), (sizeof((const char*[]){__VA_ARGS__})/sizeof(const char*)))
+b32 strcmp_many(const char *str, const char **str_many, i32 str_many_count)
+{
+	for (i32 i = 0; i < str_many_count; i++) {
+		if (!strcmp(str, str_many[i])) return (true);
+	}
+	return (false);
+}
+
+char *shift_args(int *argc, char ***argv)
+{
+    assert(*argc > 0);
+    char *result = **argv;
+    (*argv) += 1;
+    (*argc) -= 1;
+    return result;
+}
+
 int main(int argc, char **argv)
 {
-    if (argc == 1) {
+    if (argc <= 1) {
         printf("Please provide an bpm image path to display \n");
-    } else if (argc > 1) {
-        BitmapRawData bitmap = read_bitmap_file(argv[1]);
-        print_bitmap(bitmap);
-        free(bitmap.data);
+        return (0);
+    }
+    shift_args(&argc, &argv); // ignore programs name/path
+    
+    if (flag_compare(argv[0], "-c")) {
+        shift_args(&argc, &argv);
+        PrintColorCharacterSet = shift_args(&argc, &argv);
     }
 
+    BitmapRawData bitmap = read_bitmap_file(shift_args(&argc, &argv));
+    print_bitmap(bitmap);
+    free(bitmap.data);
+
+    return (0);
 }
 
